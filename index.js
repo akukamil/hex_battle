@@ -3754,7 +3754,7 @@ async function init_game_env(l) {
 					
 		//время последнего посещения
 		let last_seen_ts = data.tm || 1000;
-		check_daily_reward(last_seen_ts);
+		//check_daily_reward(last_seen_ts);
 		
 		//номер комнаты
 		if (my_data.rating >= 1500)
