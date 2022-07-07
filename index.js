@@ -1527,7 +1527,7 @@ var game = {
 				
 		//загружаем уровень
 		let level_loader=new PIXI.Loader();
-		level_loader.add("level", `${git_src}/levels/L3.txt`,{timeout: 5000});	
+		level_loader.add("level", `${git_src}levels/L3.txt`,{timeout: 5000});	
 		await new Promise((resolve, reject)=> level_loader.load(resolve))
 		this.level_data = JSON.parse(level_loader.resources.level.data);
 		
@@ -3868,7 +3868,7 @@ async function load_resources() {
 
 
 	game_res=new PIXI.Loader();
-	game_res.add("m2_font", git_src+"/fonts/MS_Comic_Sans/font.fnt");
+	game_res.add("m2_font", git_src+"fonts/MS_Comic_Sans/font.fnt");
 
 	game_res.add('receive_move',git_src+'receive_move.mp3');
 	game_res.add('note',git_src+'note.mp3');
