@@ -1,13 +1,14 @@
 var M_WIDTH=800, M_HEIGHT=450;
-var app, game_res, game, objects={}, LANG = 0, state="",my_role="", game_tick=0, made_moves=0, game_id=0, my_turn=0, my_tile=0, connected = 1;
+var app, game_res, game, objects={}, LANG = 0, state="", game_tick=0, made_moves=0, game_id=0, my_turn=0, my_tile=0, connected = 1;
 var  h_state=0, game_platform="", hidden_state_start = 0, room_name = 'states2';
-var players="", pending_player="",tm={},me_conf_play=0, opp_conf_play=0;
+var players="", pending_player="",tm={},me_conf_play=0, opp_conf_play=0, opp_tile = 0, opponent = {};
 var my_data={opp_id : ''},opp_data={};
 var some_process = {}, git_src = "";
 var WIN = 1, DRAW = 0, LOSE = -1, NOSYNC = 2;
-const YELLOW_PLAYER = 1, RED_PLAYER = 2, GREEN_PLAYER = 3, NO_PLAYER = 0;
+const NO_PLAYER = 0, YELLOW_PLAYER = 1, RED_PLAYER = 2;
 
 grid_data=[[244.115,45],[296.077,45],[348.038,45],[400,45],[451.962,45],[503.923,45],[555.885,45],[218.135,90],[270.096,90],[322.058,90],[374.019,90],[425.981,90],[477.942,90],[529.904,90],[581.865,90],[192.154,135],[244.115,135],[296.077,135],[348.038,135],[400,135],[451.962,135],[503.923,135],[555.885,135],[607.846,135],[166.173,180],[218.135,180],[270.096,180],[322.058,180],[374.019,180],[425.981,180],[477.942,180],[529.904,180],[581.865,180],[633.827,180],[140.192,225],[192.154,225],[244.115,225],[296.077,225],[348.038,225],[400,225],[451.962,225],[503.923,225],[555.885,225],[607.846,225],[659.808,225],[166.173,270],[218.135,270],[270.096,270],[322.058,270],[374.019,270],[425.981,270],[477.942,270],[529.904,270],[581.865,270],[633.827,270],[192.154,315],[244.115,315],[296.077,315],[348.038,315],[400,315],[451.962,315],[503.923,315],[555.885,315],[607.846,315],[218.135,360],[270.096,360],[322.058,360],[374.019,360],[425.981,360],[477.942,360],[529.904,360],[581.865,360],[244.115,405],[296.077,405],[348.038,405],[400,405],[451.962,405],[503.923,405],[555.885,405]]
+levels=[{18:2,19:0,20:0,27:0,28:0,29:0,30:0,38:0,39:0,40:0,49:0,50:0,51:1},{18:2,19:0,20:0,27:0,28:0,29:0,30:0,38:0,39:0,40:0,41:0,49:0,50:0,51:0,58:1,59:0},{18:0,19:0,20:0,27:0,28:0,29:0,30:0,31:0,37:0,38:2,39:0,40:0,41:0,42:0,48:0,49:0,50:0,51:0,52:1,58:0,59:0},{16:0,25:0,26:0,27:0,30:0,31:1,32:0,36:0,37:0,38:0,39:0,40:0,41:0,42:0,43:0,47:2,48:0,49:0,50:0,51:0,52:0,58:0,59:0},{27:0,28:0,29:0,30:0,37:0,38:0,40:0,41:0,47:0,48:0,51:0,52:0,56:1,57:0,58:0,59:0,60:0,61:0,62:2,67:0,68:0},{18:1,19:0,20:0,27:0,28:0,29:0,30:0,37:0,38:0,40:0,41:0,47:0,48:0,51:0,52:0,57:0,58:0,59:0,60:2,61:0},{18:0,19:0,20:0,26:0,27:0,28:0,29:0,30:0,31:0,36:1,37:0,41:0,42:2,47:0,48:0,51:0,52:0,57:0,58:0,59:0,60:0,61:0},{17:0,18:0,19:0,20:0,21:0,26:0,27:0,28:0,29:0,30:0,31:0,36:1,37:0,39:0,41:0,42:2,47:0,48:0,49:0,50:0,51:0,52:0,57:0,58:0,59:0,60:0,61:0},{17:1,21:0,26:0,27:0,30:0,31:0,36:0,37:0,38:0,39:0,40:0,41:0,42:0,47:0,48:0,51:0,52:0,57:0,61:2},{17:0,18:0,19:0,20:0,21:0,22:0,26:0,27:0,30:0,31:0,32:2,36:0,37:0,39:0,41:0,42:0,46:1,47:0,48:0,51:0,52:0,56:0,57:0,58:0,59:0,60:0,61:0},{2:0,3:0,4:0,9:0,10:0,11:0,12:0,17:2,18:0,19:0,20:0,21:2,26:0,27:0,30:0,31:0,36:0,37:0,41:0,42:0,47:0,48:0,51:0,52:0,57:0,58:0,60:0,61:0,66:0,67:0,68:0,69:0,74:0,75:1,76:0},{16:2,17:0,21:0,22:1,26:0,27:0,28:0,29:0,30:0,31:0,37:0,38:0,39:0,40:0,41:0,47:0,48:0,49:0,50:0,51:0,52:0,56:1,57:0,61:0,62:2},{3:0,4:0,5:0,6:0,10:0,11:0,12:0,13:0,14:0,18:1,19:0,21:0,22:0,23:0,27:0,28:0,31:0,32:0,33:2,36:0,37:0,38:0,41:0,42:0,43:0,46:0,47:1,48:0,51:0,52:0,53:0,55:0,56:0,57:0,60:0,61:2,64:0,65:0,66:0,67:0,68:0,69:0,72:0,73:0,74:0,75:0,76:0},{2:0,3:2,4:0,5:0,6:0,9:0,10:0,11:0,12:0,13:2,14:0,17:0,19:0,21:0,23:0,26:0,28:0,30:0,32:0,36:0,38:0,40:0,42:0,46:0,47:0,48:0,49:0,50:0,51:0,52:0,55:0,56:0,61:0,64:0,65:1,66:0,67:0,68:0,69:0,72:0,73:0,74:0,75:1,76:0},{10:1,11:0,17:0,18:0,19:0,20:0,21:0,26:0,31:0,35:1,36:0,37:0,38:0,39:0,40:0,41:0,42:2,43:0,46:0,48:0,51:0,53:0,56:0,58:0,60:0,62:0,65:0,67:2,68:0,70:0,73:0,74:0,75:0,76:0,77:0},{0:0,1:0,2:0,3:0,4:0,5:0,6:0,7:0,10:0,11:0,14:0,15:1,17:0,18:0,19:0,20:0,21:0,23:2,24:0,26:0,31:0,33:0,34:0,35:0,36:0,38:0,39:0,40:0,42:0,43:0,44:0,45:0,47:0,52:0,54:0,55:2,57:0,58:0,59:0,60:0,61:0,63:1,64:0,67:0,68:0,71:0,72:0,73:0,74:0,75:0,76:0,77:0,78:0}]
 
 irnd = function(min,max) {	
     min = Math.ceil(min);
@@ -141,12 +142,13 @@ class hex_cell_class extends PIXI.Container {
 		super();
 		this.id=id;
 		this.player_id =0;
+		this.ready = true;
 		
 		this.bcg = new PIXI.Sprite(gres.hex_cell_0.texture);
 		this.bcg.anchor.set(0.5,0.5);	
 		this.bcg.interactive = true;
 		this.bcg.buttonMode = true;
-		this.bcg.pointerdown = game.tile_down.bind(game,this.id);
+		this.bcg.pointerdown = board.tile_down.bind(board,this);
 		
 		this.bcg2 = new PIXI.Sprite(gres.hex_cell_0.texture);
 		this.bcg2.anchor.set(0.5,0.5);
@@ -170,20 +172,31 @@ class hex_cell_class extends PIXI.Container {
 		
 		this.addChild(this.bcg,this.bcg2,this.icon, this.selection_frame);
 	}	
-	
-	
-	async flip(target_id) {
 		
-		let keep_scale_x = this.bcg.scale_x;
+	async flip(target_id, speed) {
+		
+
 		this.player_id = target_id;
-		anim2.add(this.icon,{alpha:[1, 0]}, false, 0.25,'linear');		
-		await anim2.add(this.bcg,{scale_x:[keep_scale_x, 0]}, true, 0.25,'linear');		
+		anim2.add(this.icon,{alpha:[1, 0]}, false, speed,'linear');		
+		await anim2.add(this.bcg,{scale_x:[1, 0]}, true, speed,'linear');		
 		this.bcg.texture = gres['hex_cell_'+this.player_id].texture;	
 		this.icon.texture = gres['icon_'+this.player_id].texture;
 		this.icon.visible = true;
-		anim2.add(this.icon,{alpha:[0, 1]}, true, 0.25,'linear');	
-		anim2.add(this.bcg,{scale_x:[0, keep_scale_x]}, true, 0.25,'linear');		
+		anim2.add(this.icon,{alpha:[0, 1]}, true, speed,'linear');	
+		anim2.add(this.bcg,{scale_x:[0, 1]}, true, speed,'linear');		
 		
+	}
+	
+	async flip_empty(target_id, time) {
+
+		await anim2.add(this.bcg,{scale_x:[1, 0]}, true, time*0.5,'linear');		
+		this.bcg.texture = gres['hex_cell_'+target_id].texture;	
+		this.icon.texture = gres['icon_'+target_id].texture;
+		this.icon.visible = true;
+		this.player_id = target_id;
+		anim2.add(this.icon,{alpha:[0,1]}, true, time*0.5,'linear');	
+		await anim2.add(this.bcg,{scale_x:[0,1]}, true, time*0.5,'linear');	
+	
 	}
 	
 	async recolor(target_id, speed) {
@@ -205,6 +218,7 @@ var anim2 = {
 	c3: 1.70158 + 1,
 	c4: (2 * Math.PI) / 3,
 	c5: (2 * Math.PI) / 4.5,
+	empty_spr : {x:0,visible:false,ready:true, alpha:0},
 		
 	slot: [null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null],
 	
@@ -445,7 +459,7 @@ var big_message = {
 	
 	p_resolve : 0,
 		
-	show: function(t1,t2) {
+	show: async function(t1,t2) {
 				
 		if (t2!==undefined || t2!=="")
 			objects.big_message_text2.text=t2;
@@ -453,19 +467,21 @@ var big_message = {
 			objects.big_message_text2.text='**********';
 
 		objects.big_message_text.text=t1;
-		anim2.add(objects.big_message_cont,{y:[-180,objects.big_message_cont.sy]}, true, 0.6,'easeOutBack');		
-				
+		objects.big_message_cont.scale_xy=0.8
+		objects.big_message_cont.alpha=0.5
+		await anim2.add(objects.big_message_cont,{x:[800,objects.big_message_cont.sx]}, true, 0.6,'easeOutBack');		
+		await anim2.add(objects.big_message_cont,{scale_xy:[0.8,1],alpha:[0.5,1]}, true, 0.6,'easeOutBack');	
 		return new Promise(function(resolve, reject){					
 			big_message.p_resolve = resolve;	  		  
 		});
 	},
 
-	close : function() {
+	close : async function() {
 		
 		if (objects.big_message_cont.ready===false)
 			return;
-
-		anim2.add(objects.big_message_cont,{y:[objects.big_message_cont.sy,450]}, false, 0.4,'easeInBack');		
+		await anim2.add(objects.big_message_cont,{scale_xy:[1,0.8],alpha:[1,0.5]}, true, 0.6,'easeOutBack');	
+		await anim2.add(objects.big_message_cont,{x:[objects.big_message_cont.x,-300]}, false, 0.4,'easeInBack');		
 		this.p_resolve("close");			
 	}
 
@@ -473,272 +489,103 @@ var big_message = {
 
 var board_func = {
 	
-	get_checkers_left : function(checkers) {
+	get_advantage : function(board, id0, id1) {
+		let id0_cnt = 0;
+		let id1_cnt = 0;
 		
-		let my_checkers_left = 0;
-		let opp_checkers_left = 0;		
-		
-		for (let [i, p] of Object.entries(pref.b_conf))
-			if (checkers[i*1].visible === true && checkers[i*1].ready === true)	my_checkers_left++;
-
-		for (let [i, p] of Object.entries(opp_data.b_conf))
-			if (checkers[31 - i].visible === true && checkers[31 - i].ready === true)	opp_checkers_left++;
+		board.forEach(t=>{
 			
-		return [my_checkers_left, opp_checkers_left]
+			if (t.visible === true) {
+				
+				if (t.player_id === id0)
+					id0_cnt++;
+				
+				if (t.player_id === id1)
+					id1_cnt++;				
+
+			}
+		})
 		
+		return id0_cnt - id1_cnt;		
 	},
 	
-	update_motion : function(checkers, draw) {
+	perform_move : function (board, move_data) {
 		
-		//обрабатываем движение шашек
-		let motion_finished = 1;
-		for (let i = 0 ; i < checkers.length ; i++) {	
-			
-			let c = checkers[i];
-			if (c.visible === true && (c.dx !==0 || c.dy !== 0)) {
-								
-				c.x = r2(c.x + c.dx);
-				c.y = r2(c.y + c.dy);
-				
-				if ((c.x > 600 || c.x < 200 || c.y > 420 || c.y < 20) && (c.ready === true || draw === 0)) {					
-					if (draw === 1) {
-						
-						sound.play('chk_out');
-						anim2.add(c,{alpha:[1, 0]}, false, 0.5,'linear');							
-					}				
-					else
-						c.visible = false;
-				}
-				
+		if (move_data[2] === 0)
+			this.move(board, move_data[0], move_data[1])
+
+		if (move_data[2] === 1)
+			this.jump(board, move_data[0], move_data[1])
+	},
 	
-				c.dx = r2(c.dx * 0.93);				
-				c.dy = r2(c.dy * 0.93);
+	get_all_moves : function (board, player_id) {
+		
+		moves = [];
+		
+		for (let tile0 of board) {
+			
+			if (tile0.visible === true && tile0.player_id === player_id) {
 				
-				if ((Math.abs(c.dx) + Math.abs(c.dy)) < 0.03) {
-					c.dx = 0;	
-					c.dy = 0;
-				} else {
-					motion_finished = 0;
-				}				
-			}		
+				for (let n0 of tile0.n0) {					
+					let tile1 = board[n0]
+					if (tile1.visible === true && tile1.player_id === NO_PLAYER)
+						moves.push([tile0.id, tile1.id,0]);
+				}
+					
+				for (let n1 of tile0.n1) {					
+					let tile1 = objects.hex_cells[n1]
+					if (tile1.visible === true && tile1.player_id === NO_PLAYER)
+						moves.push([tile0.id, tile1.id,1]);							
+				}
+			}				
 		}		
-		return motion_finished;
+			
+		return moves;
 	},
 	
-	update_collisions : function(checkers, inv, show_boom) {
-				
-		//проверяем столкновения шашек
-		let num_of_checkers = 32;			
-		for (let _i = 0 ; _i < num_of_checkers - 1 ; _i++) {
-						
-			let i = inv === 1 ? num_of_checkers - 1 - _i : _i;			
-			let c1 = checkers[i];
-			for (let _k = _i + 1 ; _k < num_of_checkers ; _k++) {
-				
-				
-				let k = inv === 1 ? num_of_checkers - 1 - _k : _k;		
-				let c2 = checkers[k];
-				if (c1.visible === true && c2.visible === true) {
-					
-					let dx = r2(c1.x - c2.x);
-					let dy = r2(c1.y - c2.y);
-					let d = r2(Math.sqrt(dx*dx + dy*dy));
-					if (d < 42) {
-						
-						
-						if (show_boom === 1) sound.play('hit');
-								
-						
-						let resp = board_func.collision_response2(c1.x,c1.y,c1.dx,c1.dy,c1.m, c2.x,c2.y,c2.dx,c2.dy,c2.m);
-												
-						c1.dx=resp[0];
-						c1.dy=resp[1];						
-						c2.dx=resp[2];
-						c2.dy=resp[3];							
-						
-					}					
-				}				
-			}			
-		}
+	get_board_copy : function(board) {
 		
-		//провряем столкновения с минами
-		for (let _i = 0 ; _i < num_of_checkers  ; _i++) {
-						
-			let i = inv === 1 ? num_of_checkers - 1 - _i : _i;			
-			let c1 = checkers[i];
-			
-			for (let m = 32 ; m < 40 ;m++) {
-				let mine = checkers[m];
-				
-				if (c1.visible === true && mine.visible === true) {
-				
-
-					let dx = c1.x - mine.x;
-					let dy = c1.y - mine.y;
-					let d = r2(Math.sqrt(dx*dx+dy*dy));
-					if (d<38) {		
-						
-						c1.visible = false;
-						mine.visible = false;	
-						if (show_boom === 1) {
-							game.add_boom(mine.x + dx*0.5,mine.y + dy*0.5);						
-							sound.play('blow');
-						}
-
-					}					
-					
-				}
-			}
-		}
+		let new_board =[];
 		
-		/*
-		//столкновения со стенами
-		for (let _i = 0 ; _i < num_of_checkers ; _i++) {
-						
-			let i = inv === 1 ? num_of_checkers - 1 - _i : _i;			
-			let c = checkers[i];			
-			let top_overlap = c.y - 21 - 20;
-			let bot_overlap = c.y + 21 - 420
-			if (top_overlap < 0) { c.y -= top_overlap; c.dy = -c.dy; if (show_boom === 1) sound.play('hit'); }
-			if (bot_overlap > 0) { c.y -= bot_overlap; c.dy = -c.dy; if (show_boom === 1) sound.play('hit');}		
-			
-		}*/
+		//создаем прокси карту
+		board.forEach((t,i)=>{			
+			new_board.push({visible:t.visible, player_id :t.player_id, n0:[...t.n0], n1:[...t.n1]});
+		})
 		
-		
-		
-		
-		
-
-
-		//убираем все перекрытия
-		let no_overlap = 0;
-		while(no_overlap === 0) {
-			no_overlap = 1;
-			for (let _i = 0 ; _i < num_of_checkers - 1 ; _i++) {
-							
-				let i = inv === 1 ? num_of_checkers - 1 - _i : _i;			
-				let c1 = checkers[i];
-				for (let _k = _i + 1 ; _k < num_of_checkers ; _k++) {
-					
-					
-					let k = inv === 1 ? num_of_checkers - 1 - _k : _k;		
-					let c2 = checkers[k];
-					if (c1.visible === true && c2.visible === true) {
-						
-						
-						let dx = r2(c1.x - c2.x);
-						let dy = r2(c1.y - c2.y);
-						let d = r2(Math.sqrt(dx*dx + dy*dy));
-						let overlap = 42 - d;
-						if (d < 42) {
-							
-							dx /= d;
-							dy /= d;
-							overlap += 0.3;
-							c2.x = r2(c2.x - dx * overlap / 2);
-							c2.y = r2(c2.y - dy * overlap / 2);
-							
-							c1.x = r2(c1.x + dx * overlap / 2);
-							c1.y = r2(c1.y + dy * overlap / 2);
-							no_overlap = 0;
-						}					
-					}				
-				}			
-			}			
-		}
-
+		return new_board;
 	},
 	
-	get_free_point : function(checkers) {
-		
-		let place_found = 0;
-		let px = 0;
-		let py = 0;
-		while (place_found === 0) {
-			
-			place_found = 1;
-			px = irnd(0,340) + 240;
-			py = irnd(0,340) + 50;
-			
-			for (let c of checkers) {
-			
-				if (c.visible === true) {
-					
-					let dx = px - c.x;
-					let dy = py - c.y;
-					let d = Math.sqrt(dx*dx+dy*dy);
-					if (d < 50) {
-						place_found = 0;
-						break;
-					}
-				}				
-			}
-		}
-		
-		return [px,py];		
-		
+	move : function(board, id0, id1) {		
+		board[id1].player_id = board[id0].player_id;
+		this.flip(board,id1);		
 	},
 	
-	get_num_of_mines : function (checkers) {
-		
-		let num_of_mines = 0;
-		for (let i = 32 ; i < 40 ; i++)
-			if (checkers[i].visible === true)
-				num_of_mines++
-			
-		return num_of_mines;		
+	jump : function (board, id0, id1) {		
+	
+		board[id1].player_id = board[id0].player_id;
+		board[id0].player_id = NO_PLAYER;
+		this.flip(board,id1);
 	},
 	
-	print : function(checkers, inv) {
+	flip : function(board, tile_id) {	
 		
-		let num_of_checkers = 32;			
-		for (let _i = 0 ; _i < num_of_checkers - 1 ; _i++) {
-						
-			let i = inv === 1 ? num_of_checkers - 1 - _i : _i;			
-			let c = checkers[i];
-			
-			if (c.visible === true) {
-				
-				if (inv === 1)
-					console.log(i,800 - c.x,440 - c.y, c.x,c.y);
-				else
-					console.log(i,c.x,c.y)				
-				
-			}
-;
-			
-		}
-		
-		
-	},
-			
-	collision_response2 : function(p0x, p0y, v0x, v0y, p0m, p1x, p1y, v1x, v1y, p1m) {
-
-
-		let u=(p1x-=p0x)*p1x+(p1y-=p0y)*p1y;
-		let v=v0x*p1x+v0y*p1y-v1x*p1x-v1y*p1y;
-		let mk1=2*p1m/(p1m+p0m);
-		let mk0=2*p0m/(p1m+p0m);
-		
-		let dx0=r2(v0x-(p1x*=v/u)*mk1)
-		let dy0=r2(v0y-(v*=p1y/u)*mk1)
-		let dx1=r2(v1x+p1x*mk0)
-		let dy1=r2(v1y+v*mk0)
-		return [dx0,dy0,dx1,dy1]
-		
-		
-	},
-
-
+		let my_tile_id = board[tile_id].player_id;
+		board[tile_id].n0.forEach(t=>{			
+			let tile = board[t];
+			if (tile.visible === true && tile.player_id!==0 && tile.player_id!==my_tile_id)
+				tile.player_id = my_tile_id;			
+		})		
+	}
 }
 
-var online_game = {
+var mp_game = {
 	
 	name : 'online',
 	start_time : 0,
 	disconnect_time : 0,
 	move_time_left : 0,
 	timer_id : 0,
+	my_role : "",
 	
 	calc_new_rating : function (old_rating, game_result) {
 		
@@ -756,22 +603,49 @@ var online_game = {
 		
 	},
 	
-	activate : async function (c_texture) {
+	activate : async function (role) {
+		
+		this.my_role = role;
+		
+		if (this.my_role === 'master') {
+			my_turn = 1;			
+			my_tile = 1;
+			opp_tile = 3;
+			board.draw_board(levels[15], my_tile, opp_tile);
+		}
+
+		else {
+			my_turn = 0;			
+			my_tile = 1;
+			opp_tile = 3;
+			board.draw_board(levels[15], opp_tile, my_tile);
+		}
+				
+		
+		//objects.desktop.texture = gres.desktop.texture;
+		//anim2.add(objects.desktop,{alpha:[0,1]}, true, 0.4,'linear');
+		
+		objects.my_card_cont.visible = true;
+		objects.opp_card_cont.visible = true;
+		
 		
 		//пока еще никто не подтвердил игру
 		this.me_conf_play = 0;
 		this.opp_conf_play = 0;
 		
-
-
+		objects.bee_cnt.x = 150;
+		objects.opp_cnt.x= 650;
+		objects.bee_cnt.visible=true;
+		objects.opp_cnt.visible = true;
+		
 		//счетчик времени
-		this.move_time_left = 15;
-		this.timer_id = setTimeout(function(){online_game.timer_tick()}, 1000);
+		this.timer_id = setTimeout(function(){mp_game.timer_tick()}, 1000);
 		objects.timer_text.tint=0xffffff;
 		
 		//отображаем таймер
 		objects.timer_cont.visible = true;
 		objects.game_buttons_cont.visible = true;
+		this.reset_timer(20);
 		
 		//фиксируем врему начала игры
 		this.start_time = Date.now();
@@ -782,9 +656,9 @@ var online_game = {
 			firebase.database().ref("players/"+my_data.uid+"/rating").set(lose_rating);
 		
 		//устанавливаем локальный и удаленный статус
-		set_state({state : 'p'});		
-		
-		
+		set_state({state : 'p'});	
+				
+		opponent = this;
 		
 	},
 	
@@ -831,23 +705,23 @@ var online_game = {
 		objects.timer_text.text="0:"+this.move_time_left;
 		
 		//следующая секунда
-		this.timer_id = setTimeout(function(){online_game.timer_tick()}, 1000);		
+		this.timer_id = setTimeout(function(){mp_game.timer_tick()}, 1000);		
 	},
 	
-	reset_timer : function() {
+	reset_timer : function(t) {
 		
 		//обовляем время разъединения
 		this.disconnect_time = 0;
 		
-		//перезапускаем таймер хода
-		this.move_time_left = 32;
+		//перезапускаем таймер хода		
+		this.move_time_left = t || 32;
 		objects.timer_text.text="0:"+this.move_time_left;
 		objects.timer_text.tint=0xffffff;
 		
 		if (my_turn === 1)
-			objects.timer_cont.x = 10;
+			objects.timer_cont.x = 0;
 		else
-			objects.timer_cont.x = 620;
+			objects.timer_cont.x = 680;
 		
 	},
 		
@@ -879,31 +753,26 @@ var online_game = {
 		
 		//обновляем даные на карточке
 		objects.my_card_rating.text=my_data.rating;
-	
-	
+		
 		//если диалоги еще открыты
 		if (objects.stickers_cont.visible===true)
 			stickers.hide_panel();	
 		
 		//если диалоги еще открыты
-		if (objects.giveup_dialog.visible===true)
-			giveup_menu.hide();
+		if (objects.confirm_cont.visible===true)
+			confirm_dialog.close();
 				
 		//убираем элементы
 		objects.timer_cont.visible = false;
 		objects.game_buttons_cont.visible = false;
 		
-		//отключаем взаимодейтсвие с доской
-		objects.board.pointerdown = function() {};
 		
 		//воспроизводим звук
 		if (result_number === DRAW || result_number === LOSE || result_number === NOSYNC )
 			sound.play('lose');
 		else
 			sound.play('win');
-		
-		
-
+				
 		//если игра результативна то записываем дополнительные данные
 		if (result_number === DRAW || result_number === LOSE || result_number === WIN) {
 			
@@ -947,218 +816,562 @@ var online_game = {
 			
 		}
 		
-		//проверяем выход в мелкую комнату
-		if (old_rating >= 1500 &&  my_data.rating <1500) {
-			firebase.database().ref(room_name+"/"+my_data.uid).remove();
-			room_name = 'states';
-			message.add('Вы перешли в комнату для слабых игроков (((')
-		}
-		
-		//проверяем выход в большую комнату
-		if (my_data.rating >= 1500 &&  old_rating <1500) {
-			firebase.database().ref(room_name+"/"+my_data.uid).remove();
-			room_name = 'states2';
-			message.add('Добро пожаловать в комнату для сильных игроков )))')
-		}
 	
 		await big_message.show(result_info, ['Рейтинг','Rating'][LANG]+`: ${old_rating} > ${my_data.rating}`)
-
-
+		set_state({state : 'o'});	
+		this.close();
+		main_menu.activate();
 		
 	},
 	
-	send_move : function(data) {
+	send_move : function(t0id, t1id) {
 		
-		firebase.database().ref("inbox/"+opp_data.uid).set({sender:my_data.uid,message:"MOVE",tm:Date.now(),data:data});
+		firebase.database().ref("inbox/"+opp_data.uid).set({sender:my_data.uid,message:"MOVE",tm:Date.now(),data:[t0id, t1id]});
 		
 	},
 	
-	clear : function() {
+	receive_move : function(data) {
+		
+		board.process_incoming_move(data[0], data[1]);
+		
+	},
+	
+	finished_event : async function(res) {
 		
 		
+		clearTimeout(this.timer_id);
+		//alert(res);
+		objects.my_card_cont.visible = false;
+		objects.opp_card_cont.visible = false;
+		objects.timer_cont.visible = false;
+		objects.game_buttons_cont.visible = false;
+		await big_message.show (["Вы выиграли","Вы проиграли","Ничья"][res],"еще раз?")		
+		objects.grid_cont.visible = false;
+		set_state ({state : 'o'});
+		main_menu.activate();
+		
+	},
+	
+	giveup : async function() {
+		
+		let res = await confirm_dialog.show(['Сдаетесь?','GiveUP?'][LANG])
+		
+		if (res !== 'ok') return;
+		
+		//заканчиваем игру поражением
+		this.stop('my_giveup')
+		
+		//отправляем сопернику что мы сдались
+		firebase.database().ref("inbox/"+opp_data.uid).set({sender:my_data.uid,message:"GIVEUP",tm:Date.now()});
+		
+	},
+	
+	close : function() {
+		
+		objects.grid_cont.visible = false;
+		objects.my_card_cont.visible = false;
+		objects.opp_card_cont.visible = false;
+		objects.timer_cont.visible = false;
+		objects.game_buttons_cont.visible = false;
+		objects.bee_cnt.visible = false;
+		objects.opp_cnt.visible = false;
 	}
 	
 }
 
-var bot_game = {
+var sp_game = {
 
 	name :'bot',
 	on : 0,
-	b_conf : {24:[7,0,1],25:[7,1,1],26:[7,2,1],27:[7,3,1],28:[7,4,1],29:[7,5,1],30:[7,6,1],31:[7,7,1]},
-	proxy_checkers : [],
+	level_id : 0,
 
-	activate: async function() {
-
-		//заполняем массив прокси шашек
-		if (this.proxy_checkers.length === 0)
-			for(let i = 0 ; i < 40 ; i++)
-				this.proxy_checkers.push({x:0,y:0,dx:0,dy:0,visible:false,ready:true});
+	activate: async function(_opp_tile) {
 
 		//устанавливаем локальный и удаленный статус
 		set_state ({state : 'b'});
-		this.on = 1;
-				
-		//расставляем шашки бота
-		for (let [i, p] of Object.entries(this.b_conf)) {	
-			i = 31 - i;			
-			let py = 7 - p[0];
-			let px = 7 - p[1];			
-			objects.checkers[i].y = objects.board.sy + 25 + 10 + py * 50;				
-			objects.checkers[i].x = objects.board.sx + 25 + 10 + px * 50;
-			objects.checkers[i].m = p[2];
-			objects.checkers[i].bcg.texture = gres['red_checker'+p[2]].texture;
-			objects.checkers[i].visible = true;
-		}
-		
-				
-		opp_data.b_conf = this.b_conf;
+		this.on = 1;							
 		
 		//таймер уже не нужен
 		objects.timer_cont.visible = false;
-		objects.game_buttons_cont.visible = false;
-		objects.sbgb_cont.visible = true;
-		
-		//устанаваем положение таймер хоть он и не задействован
-		objects.timer_cont.x=10;
-		objects.timer_text.text="<***>";
-		await new Promise((resolve, reject) => setTimeout(resolve, 3000));
-		this.send_move();
 
+				
+		//это тайлы соперника и мои
+		my_tile = 1;
+		opp_tile = irnd(2,4);				
+		board.draw_board(levels[this.level_id],my_tile,opp_tile);
+				
+		objects.bee_cnt.x = 50;
+		objects.opp_cnt.x= 750;
+		objects.bee_cnt.visible=true;
+		objects.opp_cnt.visible = true;
+				
+				
+		//показываем слева
+		base_scale = objects.grid_cont.base_scale_xy;
+		objects.grid_cont.scale_xy = base_scale * 0.8;
+		objects.grid_cont.alpha = 0.5;
+		
+		objects.level_title.text = [`Уровень ${this.level_id+1}`,`Level ${this.level_id+1}`][LANG];
+		anim2.add(objects.level_title,{x:[-100, objects.level_title.sx]}, true, 1,'easeOutBack');	
+		await anim2.add(objects.grid_cont,{x:[1200, 400]}, true, 1,'easeOutBack');	
+		await anim2.add(objects.grid_cont,{scale_xy:[base_scale*0.8,base_scale], alpha:[0.5,1]}, true, 0.5,'easeOutBack');			
+				
+		objects.sbg_button.visible = true;
+				
+		my_turn = 1;
+		
+		opponent = this;
 	},
 
-	stop : async function(result) {
-
-		let res_array = [
-			['my_timeout',LOSE, ['Вы проиграли!\nУ вас закончилось время','You have lost!\nYou have run out of time']],
-			['opp_timeout',WIN , ['Вы выиграли!\nУ соперника закончилось время','You have won!\nThe opponents time has run out']],
-			['my_giveup' ,LOSE, ['Вы сдались!','You gave up!']],
-			['opp_giveup' ,WIN , ['Вы выиграли!\nСоперник сдался','You have won!Opponent gave up\n']],
-			['no_checkers_left',DRAW, ['Ничья','Draw']],
-			['only_my_left',WIN , ['Вы выиграли!\nСкинули все шашки соперника.','You have won!\nYou have thrown off all the opponents checkers']],
-			['only_opp_left',LOSE, ['Вы проиграли!\nСоперник скинул все ваши шашки.','You have lost!\nOpponent has thrown off all your checkers']],
-			['my_stop',DRAW , ['Вы отменили игру.','You canceled the game']]			
-		];
-		
-	
-		this.on = 0;
-		let result_number = res_array.find( p => p[0] === result)[1];
-		let result_info = res_array.find( p => p[0] === result)[2][LANG];				
-			
-		//выключаем элементы
-		objects.timer_cont.visible = false;
-		objects.sbgb_cont.visible = false;
-		
-		//отключаем взаимодейтсвие с доской
-		objects.board.pointerdown = function() {};
-		
-		//воспроизводим звук
-		if (result_number === DRAW || result_number === LOSE)
-			sound.play('lose');
-		else
-			sound.play('win');
-		
-		
-		await big_message.show(result_info, ')))')
-		
-	},
-
-	make_move: async function() {
-
-
-	},
-	
 	reset_timer : function() {
 		
 		
 	},
 	
 	send_move : async function() {
+
+		//делаем случайный ход
+		let moves = board_func.get_all_moves(objects.hex_cells, opp_tile);
+		let best_move = [];
+		let best_adv = -999;
 		
-		await new Promise((resolve, reject) => setTimeout(resolve, 2000));
+		//если нету ходов
+		if (moves.length === 0)	return;
 		
-		//проверяем не законченная ли это игра
-		[my_checkers_left, bot_checkers_left] = board_func.get_checkers_left(objects.checkers);
-		if (my_checkers_left === 0 || bot_checkers_left === 0 )
-			return;
-				
-		let best_data = {};
-		let best_res = -999;
-		for(let a = 0 ; a < 300 ; a++)	{
+		//проверяем каждый ход
+		moves.forEach(m => {
 			
-			//получаем перечень шашек
-			let chk_list =[];
-			for (let i = 0 ; i < 16;i++)
-				if (objects.checkers[i].visible === true)
-					chk_list.push(i);			
-			
-			//делаем случайный ход шашками бота
-			let rnd_chk = chk_list[Math.floor(Math.random()*chk_list.length)];
-					
-			let rand_dir = Math.random() * Math.PI * 2;
-			let dx = Math.sin(rand_dir) * 30;
-			let dy = Math.cos(rand_dir) * 30;
-			this.simulate(rnd_chk,dx,dy);
-			let res = this.get_bot_result();
-			res = res[1] - res[0]
-			if (res > best_res) {						
-				
-				best_data = {cid: 31 - rnd_chk,dx:-dx,dy:-dy};
-				best_res = res;
+			let board = board_func.get_board_copy(objects.hex_cells);
+			board_func.perform_move(board,m);
+			let adv = board_func.get_advantage(board, opp_tile, my_tile);
+			if (adv > best_adv) {
+				best_adv = adv;
+				best_move = m;				
 			}
-			if (this.on === 0)	return;
-			//await new Promise((resolve, reject) => setTimeout(resolve, 20));
-		}				
 			
-		game.receive_move(best_data);
+			
+		})
+		
+		//let random_move = moves[Math.floor(Math.random()*moves.length)];
+		board.process_incoming_move(best_move[0], best_move[1])
 		
 	},
 	
-	get_bot_result : function() {
+	finished_event : async function(res) {
 		
-		[my_checkers_left, bot_checkers_left] = board_func.get_checkers_left(this.proxy_checkers);
-		return [my_checkers_left, bot_checkers_left];
+		let bee ={};
+		if (res === 0)
+			bee = objects.bee_win
+		else
+			bee = objects.bee_lose
+		
+		
+		let base_scale = objects.grid_cont.base_scale_xy;
+		await anim2.add(objects.grid_cont,{scale_xy:[base_scale, base_scale*0.6], alpha:[1,0.5]}, true, 0.5,'easeInBack');		
+		await anim2.add(objects.grid_cont,{x:[400, -400]}, true, 1,'easeInBack');	
+		anim2.add(bee,{y:[500, bee.sy]}, true, 1,'linear');	
+		await big_message.show (["Вы выиграли","Вы проиграли","Ничья"][res],"еще раз?")		
+		anim2.add(bee,{y:[bee.y, 500]}, false, 1,'linear');	
+		this.level_id++;
+		this.activate(irnd(2,4));
+	
+
+	},
+	
+	stop : async function() {
+		
+		if (anim2.any_on()===true)
+			return;
+		
+		if (objects.big_message_cont.visible === true)
+			return;
+		
+		let res = await confirm_dialog.show(['Уверены?','Sure?'][LANG])
+		if (res !== 'ok') return;
+		
+
+		
+		anim2.add(objects.level_title,{y:[ objects.level_title.y,-100]}, false, 1,'easeOutBack');	
+		set_state({state : 'o'});
+		this.close();
+		main_menu.activate();
+	},
+	
+	close : function() {
+		
+		//закрываем
+		objects.sbg_button.visible = false;
+		objects.grid_cont.visible = false;
+		objects.bee_cnt.visible = false;
+		objects.opp_cnt.visible = false;
+	},
+	
+	switch_close : function() {
+		
+		objects.sbg_button.visible=false;
+		anim2.add(objects.level_title,{x:[ objects.level_title.x,-100]}, false, 1,'easeOutBack');	
+		
+	}
+
+}
+
+var board = {
+	
+	selected_tile : null,
+	
+	update_stat : function () {
+		
+		let my_cnt = 0;
+		let opp_cnt = 0;
+		
+		//расставляем тайлы по сетке уровня
+		objects.hex_cells.forEach(c=>{		
+		
+			if (c.visible === true) {
+				if (c.player_id > 0) {
+					if (c.player_id === my_tile)	
+						my_cnt++;
+					else
+						opp_cnt++;
+				}
+			}
+		})
+		
+		objects.bee_cnt.text = my_cnt;
+		objects.opp_cnt.text = opp_cnt;
+		
+	},
+
+	flip_around: async function(tile, speed) {
+		
+		let flip_found = 0;
+		let cur_player_id = tile.player_id;
+		tile.n0.forEach(t=>{
+			
+			let n0_tile = objects.hex_cells[t];
+			if (n0_tile.player_id !== NO_PLAYER && n0_tile.player_id!==cur_player_id) {
+				flip_found = 1;
+				n0_tile.flip(cur_player_id, speed)				
+			}
+
+		})
+		
+		if (flip_found===1)
+			sound.play('flip');
+		
+		//это просто ожидание завершения флипов
+		await anim2.add(anim2.empty_spr,{x:[0, 1]}, false, speed * 2,'linear');	
+		
+	},
+	
+	draw_board : async function(level_data, p1, p2) {
+							
+		//расставляем тайлы по сетке уровня
+		objects.hex_cells.forEach((c,i)=>{		
+		
+			//сначала все убираем
+			c.visible=false;
+			c.icon.visible=false;
+			c.player_id = NO_PLAYER;
+			
+			let tile_player_id = level_data[i];				
+
+			//пустая ячейка
+			if (tile_player_id === 0) {
+				c.visible=true;
+				c.bcg.texture = gres['hex_cell_'+tile_player_id].texture;
+			}
+			
+			//ячейка игроков
+			if (tile_player_id > 0) {
+				c.visible=true;
+				if (tile_player_id === 1)
+					tile_player_id = p1
+				if (tile_player_id === 2)
+					tile_player_id = p2
+				
+				c.player_id = tile_player_id;						
+				c.bcg.texture = gres['hex_cell_'+c.player_id].texture;				
+				c.icon.visible=true;
+				c.icon.texture = gres['icon_'+c.player_id].texture;
+			}
+			
+		})
+		
+		//определяем границы карты
+		let left = 9999, right = -9999, up = 9999, down = -9999;
+		objects.hex_cells.forEach(c => {
+			if (c.visible === true) {				
+				if (c.x > right) right = c.x;
+				if (c.x < left) left = c.x;
+				if (c.y > down) down = c.y;
+				if (c.y < up) up = c.y;					
+			}
+		})
+		
+		let cen_x =  (left + right) * 0.5;
+		let cen_y =  (up + down) * 0.5;
+		let width = right - left;
+		let height = down - up;
+		
+		let max_width = Math.abs(grid_data[34][0] - grid_data[44][0]);
+		let max_height = Math.abs(grid_data[0][1] - grid_data[72][1]);
+		
+		objects.grid_cont.scale_xy= 2 - ((height-90)/270);
+		objects.grid_cont.base_scale_xy = objects.grid_cont.scale_xy
+		objects.grid_cont.pivot.x=cen_x;
+		objects.grid_cont.pivot.y=cen_y;
+		objects.grid_cont.x=400;
+		objects.grid_cont.y=225;	
+		
+		
+		this.update_stat();
+		
+		objects.grid_cont.visible = true;
+		
+	},
+	
+	show_av_moves : function(tile, show) {
+		
+		//выделяем тайл
+		tile.selection_frame.visible=show;
+		
+		//отображаем окружение
+		[...tile.n0,...tile.n1].forEach(h => {
+			if (objects.hex_cells[h].player_id === NO_PLAYER)
+				objects.hex_cells[h].selection_frame.visible=show;			
+		})
 		
 	},
 		
-	simulate : function(cid,dx,dy) {
+	jump: async function (tile0, tile1) {
+		
+		//убираем иконку так как будет активирована полетная иконка
+		tile0.icon.visible = false;
+
+		//присваиваем номер игрока следующему тайлу
+		tile1.player_id = tile0.player_id;	
+		
+		//меняем начальный тайл
+		tile0.recolor(NO_PLAYER, 0.4);
+		tile0.player_id = NO_PLAYER;
+
+		//перелет иконки
+		objects.icon_fly.scale_xy = tile0.scale_xy;
+		objects.icon_fly.texture = tile0.icon.texture;		
+		await anim2.add(objects.icon_fly,{x:[tile0.x, tile1.x],y:[tile0.y, tile1.y]}, false, 0.4,'linear');
+
+		//устанаваем иконку
+		tile1.icon.texture = gres['icon_' + tile1.player_id].texture;
+		tile1.icon.visible=true;
+
+		//перекрашиваем конечный тайл
+		tile1.recolor(tile1.player_id, 0.4);
+
+		//меняем окружение
+		await this.flip_around(tile1, 0.2);	
+		
+	},
+	
+	clone: async function(tile0, tile1) {
+		
+		//присваиваем номер игрока следующему тайлу
+		tile1.player_id = tile0.player_id;	
+		
+		//перелет иконки
+		objects.icon_fly.scale_xy = tile0.scale_xy;
+		objects.icon_fly.texture=tile0.icon.texture;
+		await anim2.add(objects.icon_fly,{x:[tile0.x, tile1.x],y:[tile0.y, tile1.y]}, false, 0.4,'linear');
+
+
+		//устанаваем иконку на конечном тайле
+		tile1.icon.texture = gres['icon_' + tile0.player_id].texture;
+		tile1.icon.visible=true;
+		
+		//меняем цвет конечного тайла и его айди
+		tile1.recolor(tile0.player_id, 0.4);
+		
+		//определяем и меняем соседние тайлы оппонента
+		await this.flip_around(tile1, 0.2);
+		
+	},
+	
+	moves_left (player_id) {
+		
+		let num =0;
+		
+		//проверяем есть ли в окружении пусты ячейки чтобы на них прыгнуть или клонироваться
+		for (let tile of objects.hex_cells)
+			if (tile.visible === true && tile.player_id === player_id)
+				for (let n of [...tile.n0,...tile.n1])
+					if (objects.hex_cells[n].visible === true && objects.hex_cells[n].player_id === NO_PLAYER)
+						num++
+		return num;
+		
+	},
+	
+	process_incoming_move : async function(t0id, t1id) {
+		
+		//показываем ход
+		await this.make_move(t0id, t1id);
 				
-		//обрабатываем движение шашек
-		let num_of_checkers = 32;			
-		
-		//копируем текущие данные шашек в прокси шашки
-		for (let i = 0 ; i < objects.checkers.length ; i++) {
-			
-			this.proxy_checkers[i].x = objects.checkers[i].x;
-			this.proxy_checkers[i].y = objects.checkers[i].y;
-			this.proxy_checkers[i].dx = objects.checkers[i].dx;
-			this.proxy_checkers[i].dy = objects.checkers[i].dy;
-			this.proxy_checkers[i].m = objects.checkers[i].m;
-			this.proxy_checkers[i].visible = objects.checkers[i].visible;
-		}			
-		
-		this.proxy_checkers[cid].dx=dx;
-		this.proxy_checkers[cid].dy=dy;
-		
-		while (1) {
-			
-			//обрабатываем движение и возвращаем указатель завершения
-			let motion_finished = board_func.update_motion(this.proxy_checkers, 0);
-									
-			//проверяем столкновения шашек
-			board_func.update_collisions(this.proxy_checkers, 1 , 0);	
-			
-			//если движение завершены то выходим
-			if (motion_finished === 1)	return;
+		//проверяем могу ли я еще пойти
+		if (this.moves_left(my_tile) === 0) {
+			this.finish(opp_tile, 0.6);
+			return;			
 		}
 		
+		my_turn = 1;
+		opponent.reset_timer();
+		
+		
+
 	},
+	
+	process_my_move : async function(t0id, t1id) {
 		
-	clear : function() {
+		my_turn = 0;
 		
-		//выключаем элементы
-		//objects.timer_cont.visible = false;
-		this.on = 0;
-		objects.sbgb_cont.visible = false;
+		//показываем ход
+		await this.make_move(t0id, t1id);
+				
+		//проверяем завершение игры
+		if (this.moves_left(opp_tile) === 0)
+			this.finish(my_tile, 0.6);
+		
+		//отправляем оппоненту (боту или онлайн) инфу что произошол хода
+		opponent.send_move(t0id, t1id);		
+		
+		opponent.reset_timer();
+	},
+	
+	finish : async function(player_id, time) {
+		
+		let my_num = 0;
+		let opp_num = 0;
+		
+		//дополняем пустые 
+		for (let c of objects.hex_cells){			
+			if (c.visible && c.player_id === NO_PLAYER) {
+				await c.flip_empty(player_id, 0.1);				
+				this.update_stat();
+			}
+
+		}
+		
+
+		//считаем результат
+		objects.hex_cells.forEach((c,i)=>{			
+			if (c.visible === true) {
+				if (c.player_id === my_tile)
+					my_num++;
+				if (c.player_id === opp_tile)
+					opp_num++;
+			}
+		})		
+
+		
+		let res = 0;
+		if (my_num > opp_num)
+			res = 0;
+		if (my_num < opp_num)
+			res = 1;
+		if (my_num === opp_num)
+			res = 2;
+		
+		opponent.finished_event(res);		
+		
+	},	
+	
+	make_move : async function(t0id, t1id) {
+			
+		let t0 = objects.hex_cells[t0id];
+		let t1 = objects.hex_cells[t1id];
+		let surrounding = t0.n0.includes(t1.id) * 1 + t0.n1.includes(t1.id) * 2;
+		
+		if (surrounding === 1)
+			await this.clone(t0, t1);
+		else
+			await this.jump(t0, t1);
+		
+		this.update_stat();
+
+	
+	},
+	
+	tile_down : async function(tile) {
+		
+		if (objects.big_message_cont.visible === true)
+			return;
+		
+		if (my_turn === 0) {
+			message.add("Не твоя очередь");
+			return;			
+		}
+				
+		//выбрали уже выбранный тайл
+		if (tile === this.selected_tile) {
+			sound.play('move');
+			this.show_av_moves(this.selected_tile, false);
+			this.selected_tile = null;			
+			return;
+		}
+		
+		//выбрали новый тайл
+		if (this.selected_tile === null && tile.player_id === my_tile) {
+			
+			sound.play('move');
+			this.selected_tile = tile;			
+			this.show_av_moves(this.selected_tile, true);			
+			return;
+		}
+		
+		//выбрали чужой или пустой тайл
+		if (this.selected_tile === null && tile.player_id !== my_tile) {
+			sound.play('locked');
+			if (tile.ready === true)
+				anim2.add(tile,{x:[tile.x, tile.x+5]}, true, 0.25,'ease2back');	
+			return;
+		}
+		
+		//выбрали другой свой тайл
+		if (this.selected_tile !== null && tile.player_id === my_tile) {
+			sound.play('move');
+			this.show_av_moves(this.selected_tile, false);			
+			this.selected_tile = null;				
+			board.tile_down(tile);			
+			return;
+		}
+		
+		//тайл выбран и делаем ход
+		if (this.selected_tile !== null && tile.player_id === NO_PLAYER) {
+						
+			
+			//если следующий тайл входит в возможные ходы выбранного
+			let surrounding = this.selected_tile.n0.includes(tile.id) * 1 + this.selected_tile.n1.includes(tile.id) * 2;
+			if (surrounding > 0) {				
+				
+				sound.play('move');
+				
+				//фиксируем чтобы не потерять
+				let t0id = this.selected_tile.id;
+				let t1id = tile.id;
+				
+				//убираем выделенный тайл		
+				this.show_av_moves(this.selected_tile, false);		
+				this.selected_tile = null;	
+				
+				//отображаем ход
+				this.process_my_move(t0id, t1id);
+				
+			} else {
+				sound.play('locked');
+				if (tile.ready === true)
+					anim2.add(tile,{x:[tile.x, tile.x+5]}, true, 0.25,'ease2back');	
+			}
+			
+			
+		}	
 		
 	}
 
@@ -1270,54 +1483,42 @@ var	show_ad = async function(){
 
 }
 
-var giveup_menu = {
-
-	show: function() {
-
-
-		if (made_moves <-2 ) {
-			message.add(['Не сдавайтесь так быстро','Do not give up so fast'][LANG])
-			return;
-		}
-
-
-
-		if (objects.giveup_dialog.ready===false)
-			return;
-		sound.play('click');
-
-		//--------------------------
-		anim2.add(objects.giveup_dialog,{y:[450, objects.giveup_dialog.sy]}, true, 0.5,'easeOutCubic');
-
-
-	},
-
-	give_up: function() {
-
-		if (objects.giveup_dialog.ready===false)
-			return;
-		sound.play('click');
-
-		//отправляем сообщени о сдаче и завершаем игру
-		firebase.database().ref("inbox/"+opp_data.uid).set({sender:my_data.uid,message:"END",tm:Date.now(),data:{x1:0,y1:0,x2:0,y2:0,board_state:0}});
-
-		this.hide();
-
-		game.stop('my_giveup');
-
-	},
-
-	hide : function() {
-
-		if (objects.giveup_dialog.ready===false)
-			return;
+var confirm_dialog = {
+	
+	p_resolve : 0,
 		
-		sound.play('close');
+	show: function(msg) {
+								
+		if (objects.confirm_cont.visible === true) {
+			sound.play('locked')
+			return;			
+		}		
+				
+		objects.confirm_msg.text=msg;
+		
+		anim2.add(objects.confirm_cont,{y:[450,objects.confirm_cont.sy]}, true, 0.6,'easeOutBack');		
+				
+		return new Promise(function(resolve, reject){					
+			confirm_dialog.p_resolve = resolve;	  		  
+		});
+	},
+	
+	button_down : function(res) {
+		
+		if (objects.confirm_cont.ready===false)
+			return;
 
-		//--------------------------
-		anim2.add(objects.giveup_dialog,{y:[objects.giveup_dialog.sy, 450]}, false, 0.5,'easeInCubic');
-
+		this.close();
+		this.p_resolve(res);	
+		
+	},
+	
+	close : function() {
+		
+		anim2.add(objects.confirm_cont,{y:[objects.confirm_cont.sy,450]}, false, 0.4,'easeInBack');		
+		
 	}
+
 }
 
 var keep_alive= function() {
@@ -1377,12 +1578,12 @@ var process_new_message=function(msg) {
 				stickers.receive(msg.data);
 
 			//получение сообщение с сдаче
-			if (msg.message==="END" )
-				game.stop('opp_giveup');
+			if (msg.message==="GIVEUP" )
+				mp_game.stop('opp_giveup');
 
 			//получение сообщение с ходом игорка
 			if (msg.message==="MOVE")
-				game.receive_move(msg.data);
+				mp_game.receive_move(msg.data);
 		}
 	}
 
@@ -1480,7 +1681,7 @@ var req_dialog={
 
 	accept: function() {
 
-		if (objects.req_cont.ready===false || objects.req_cont.visible===false || game.motion_finished === 0)
+		if (objects.req_cont.ready===false || objects.req_cont.visible===false || objects.big_message_cont.visible===true || anim2.any_on() === true)
 			return;
 
 		
@@ -1501,7 +1702,8 @@ var req_dialog={
 
 		main_menu.close();
 		cards_menu.close();
-		game.activate(online_game, "slave");
+		sp_game.switch_close();
+		mp_game.activate("slave");
 
 	},
 
@@ -1517,300 +1719,6 @@ var req_dialog={
 
 }
 
-var game = {
-	
-	opponent : "",
-	selected_cell: -1,
-	level_data : {},
-	
-	activate : async function(opponent, role) {
-				
-		//загружаем уровень
-		let level_loader=new PIXI.Loader();
-		level_loader.add("level", `${git_src}levels/L3.txt`,{timeout: 5000});	
-		await new Promise((resolve, reject)=> level_loader.load(resolve))
-		this.level_data = JSON.parse(level_loader.resources.level.data);
-		
-		if (role==="master") {
-			my_turn=1;		
-			my_tile = YELLOW_PLAYER;
-			message.add(['Ваш ход','Your turn'][LANG])
-			
-		} else {
-			my_turn=0;
-			my_tile = RED_PLAYER;
-			message.add(['Ход соперника','Opponents move'][LANG])
-		}
-		
-		if (this.opponent !== "")
-			this.opponent.clear();
-		
-		//активируем оппонента
-		this.opponent = opponent;
-		await this.opponent.activate();	
-		
-		//расставляем тайлы по сетке уровня
-		objects.hex_cells.forEach((c,i)=>{		
-			
-			let tile_state = this.level_data[i]===undefined ? -1 :this.level_data[i];
-									
-			switch (tile_state) {				
-				
-				case -1:
-					c.visible=false;
-				break;
-				
-				case NO_PLAYER:
-					c.visible=true;
-					c.bcg.texture = gres.hex_cell_0.texture;
-					c.icon.visible=false;
-					c.player_id = NO_PLAYER;
-				break;
-				
-				case RED_PLAYER:
-					c.visible=true;
-					c.bcg.texture = gres.hex_cell_2.texture;
-					c.icon.texture = gres.icon_2.texture;
-					c.icon.visible=true;
-					c.player_id = RED_PLAYER;
-				break;
-				
-				case YELLOW_PLAYER:
-					c.visible=true;
-					c.bcg.texture = gres.hex_cell_1.texture;
-					c.icon.texture = gres.icon_1.texture;
-					c.icon.visible=true;
-					c.player_id = YELLOW_PLAYER;
-				break;
-
-			}
-		})
-		
-		
-		//показываем контейнер
-		anim2.add(objects.grid_cont,{alpha:[0, 1]}, true, 0.25,'linear');	
-		
-		//определяем границы карты
-		let left = 9999, right = -9999, up = 9999, down = -9999;
-		objects.hex_cells.forEach(c => {
-			if (c.visible === true) {				
-				if (c.x > right) right = c.x;
-				if (c.x < left) left = c.x;
-				if (c.y > down) down = c.y;
-				if (c.y < up) up = c.y;					
-			}
-		})
-		
-		let cen_x =  (left + right) * 0.5;
-		let cen_y =  (up + down) * 0.5;
-		let width = right - left;
-		let height = down - up;
-		
-		let max_width = Math.abs(grid_data[34][0] - grid_data[44][0]);
-		let max_height = Math.abs(grid_data[0][1] - grid_data[72][1]);
-
-		
-		objects.grid_cont.scale_xy= 2 - ((height-90)/270);
-		objects.grid_cont.pivot.x=cen_x;
-		objects.grid_cont.pivot.y=cen_y;
-		objects.grid_cont.x=400;
-		objects.grid_cont.y=225;
-		
-	},
-	
-	process : function() {
-		
-		//objects.grid_cont.scale_xy = Math.sin(game_tick/10)*0.2+1;
-		//objects.grid_cont.rotation = Math.sin(game_tick/20)*0.3;
-		
-	},
-		
-	flip_tiles: function(tile_obj) {
-		
-		let flip_found = 0;
-		let cur_player_id = tile_obj.player_id;
-		tile_obj.n0.forEach(t=>{
-			
-			let n0_tile = objects.hex_cells[t];
-			if (n0_tile.player_id !== NO_PLAYER && n0_tile.player_id!==cur_player_id) {
-				flip_found = 1;
-				n0_tile.flip(cur_player_id)				
-			}
-
-		})
-		
-		if (flip_found===1)
-			sound.play('flip');
-		
-		
-	},
-	
-	jump : async function (tile0, tile1) {
-				
-		//убираем иконку так как будет активирована полетная иконка
-		tile0.icon.visible = false;
-
-		//присваиваем номер игрока следующему тайлу
-		tile1.player_id = tile0.player_id;	
-		
-		//меняем начальный тайл
-		tile0.recolor(NO_PLAYER, 0.4);
-		tile0.player_id = NO_PLAYER;
-
-		//перелет иконки
-		objects.icon_fly.scale_xy = tile0.scale_xy;
-		objects.icon_fly.texture = tile0.icon.texture;		
-		await anim2.add(objects.icon_fly,{x:[tile0.x, tile1.x],y:[tile0.y, tile1.y]}, false, 0.4,'linear');
-
-		//устанаваем иконку
-		tile1.icon.texture = gres['icon_' + tile1.player_id].texture;
-		tile1.icon.visible=true;
-
-		//перекрашиваем конечный тайл
-		tile1.recolor(tile1.player_id, 0.4);
-
-		//меняем окружение
-		this.flip_tiles(tile1);		
-	
-	},
-		
-	move : async function(tile0, tile1) {
-		
-		//присваиваем номер игрока следующему тайлу
-		tile1.player_id = tile0.player_id;	
-		
-		//перелет иконки
-		objects.icon_fly.scale_xy = tile0.scale_xy;
-		objects.icon_fly.texture=tile0.icon.texture;
-		await anim2.add(objects.icon_fly,{x:[tile0.x, tile1.x],y:[tile0.y, tile1.y]}, false, 0.4,'linear');
-
-
-		//устанаваем иконку
-		tile1.icon.texture = gres['icon_' + tile0.player_id].texture;
-		tile1.icon.visible=true;
-		
-		//меняем цвет конечного тайла и его айди
-		tile1.recolor(tile0.player_id, 0.4);
-		
-		//меняем соседние тайлы оппонента
-		this.flip_tiles(tile1);		
-
-		
-	},
-	
-	tile_down : function(id) {
-					
-					
-		if (my_turn === 0) {			
-			message.add(['Не твоя очередь','Not your turn'][LANG]);
-			return;
-		}	
-					
-					
-		//убираем все выделения
-		for (let c of objects.hex_cells)
-			c.selection_frame.visible=false;
-		objects.hex_selected.visible = false;
-		
-		
-		if (this.selected_cell === id) {
-			this.selected_cell =-1;
-			sound.play('send_chk');
-			return;			
-		}
-				
-				
-		let cur_obj = objects.hex_cells[this.selected_cell];				
-		let next_tile_obj = objects.hex_cells[id];
-		
-		//если нажали на чужой тайл
-		if (this.selected_cell !== -1 && next_tile_obj.player_id!==NO_PLAYER &&  next_tile_obj.player_id !== my_tile) {		
-			message.add("Это не Ваш тайл");
-			this.selected_cell = -1
-			return;
-		}
-		
-		//это когда выбрали пустую или соперника ее нельзя выбирать
-		if (this.selected_cell === -1 && (next_tile_obj.player_id !== my_tile)) {
-			
-			anim2.add(next_tile_obj,{x:[next_tile_obj.x, next_tile_obj.x+5]}, true, 0.25,'ease2back');	
-			this.selected_cell = -1
-			return;					
-		}		
-		
-		if (this.selected_cell !== -1 && next_tile_obj.player_id === NO_PLAYER) {		
-		
-			//если близкий круг то клонирование
-			if (cur_obj.n0.includes(id)) {
-				this.move(cur_obj, next_tile_obj);				
-				this.send_move(cur_obj, next_tile_obj);
-			}
-				
-			//если дальний круг то прыжок - старый тайл становится пустым
-			if (cur_obj.n1.includes(id)) {
-				this.jump(cur_obj, next_tile_obj);
-				this.send_move(cur_obj, next_tile_obj);
-			}
-			
-			sound.play('send_chk');
-			this.selected_cell = -1
-			return;
-
-		}
-		
-		sound.play('send_chk');
-		this.selected_cell = id;
-
-		//показываем выделение текущей ячейки
-		objects.hex_selected.visible = true;
-		objects.hex_selected.x = objects.hex_cells[id].x;
-		objects.hex_selected.y = objects.hex_cells[id].y;
-		objects.hex_selected.scale_xy = objects.hex_cells[id].scale_xy;
-		
-		//отображаем окружение
-		objects.hex_cells[id].n0.forEach(h => {
-			if (objects.hex_cells[h].player_id === NO_PLAYER)
-				objects.hex_cells[h].selection_frame.visible=true;			
-		})
-		objects.hex_cells[id].n1.forEach(h => {
-			if (objects.hex_cells[h].player_id === NO_PLAYER)
-				objects.hex_cells[h].selection_frame.visible=true;			
-		})
-		
-	},
-	
-	send_move : function(tile0, tile1) {
-		
-		//отправляем оппоненту информацию о ходе
-		this.opponent.send_move({id0:tile0.id, id1:tile1.id});	
-		
-		this.opponent.reset_timer();
-		my_turn = 0;
-		
-	},
-		
-	receive_move : function(move_data) {
-		
-		let cur_obj = objects.hex_cells[move_data.id0];				
-		let next_tile_obj = objects.hex_cells[move_data.id1];
-		
-		
-		//если близкий круг то клонирование
-		if (cur_obj.n0.includes(move_data.id1))
-			this.move(cur_obj, next_tile_obj);				
-
-			
-		//если дальний круг то прыжок - старый тайл становится пустым
-		if (cur_obj.n1.includes(move_data.id1))
-			this.jump(cur_obj, next_tile_obj);
-		
-		my_turn = 1;
-		this.opponent.reset_timer();
-
-	}
-	
-}
-
 var main_menu= {
 
 	activate: async function() {
@@ -1819,32 +1727,57 @@ var main_menu= {
 			if (gres.music.sound.isPlaying === false)
 				gres.music.sound.play();
 		} 
-		
-		objects.mb_cont.visible = true;
-		
+				
+
+		some_process.main_menu = this.process;
+		anim2.add(objects.mb_cont,{x:[800,objects.mb_cont.sx]}, true, 1,'easeInOutCubic');
+		anim2.add(objects.game_title,{x:[-200,objects.game_title.sx]}, true, 1,'easeInOutCubic');
+		//objects.desktop.texture = gres.desktop.texture;
+		//anim2.add(objects.desktop,{alpha:[0,1]}, true, 0.6,'linear');
 	},
 	
 	process : function() {
 		
-
-		
+		objects.tree0.rotation = Math.sin(game_tick/2)*0.2;
+		objects.tree1.rotation = Math.sin(game_tick/4)*0.25;
+		objects.tree2.rotation = Math.sin(game_tick/2)*0.3;
+		objects.tree3.rotation = Math.sin(game_tick/2)*0.3;
+		objects.cloud0.x = Math.sin(game_tick/20)*1000;
+		objects.cloud1.x = Math.sin(2+game_tick/32)*1000;
+		objects.cloud2.x = Math.sin(4+game_tick/35)*1000;
+		objects.cloud3.x = Math.sin(6+game_tick/40)*1000;
 	},
 
 	close : async function() {
 
+		//some_process.main_menu = function(){};
 		objects.mb_cont.visible=false;
-		
+		anim2.add(objects.game_title,{x:[objects.game_title.x,-200]}, false, 0.6,'easeInOutCubic');
 		some_process.main_menu_process = function(){};
-		anim2.add(objects.mb_cont,{y:[objects.mb_cont.y,450]}, false, 0.6,'linear');	
+		anim2.add(objects.mb_cont,{x:[objects.mb_cont.x,800]}, true, 1,'easeInOutCubic');
+		//await anim2.add(objects.desktop,{alpha:[1,0]}, false, 0.6,'linear');	
 	},
 
-	play_button_down: async function () {
+	sp_button_down: async function () {
 
 		if (anim2.any_on()===true || objects.id_cont.visible === true) {
 			sound.play('locked');
 			return
 		};
 
+		sound.play('click');
+
+		await this.close();
+		sp_game.activate();
+
+	},
+	
+	mp_button_down: async function () {
+
+		if (anim2.any_on()===true || objects.id_cont.visible === true) {
+			sound.play('locked');
+			return
+		};
 
 		sound.play('click');
 
@@ -1852,7 +1785,7 @@ var main_menu= {
 		cards_menu.activate();
 
 	},
-
+	
 	lb_button_down: async function () {
 
 		if (anim2.any_on()===true) {
@@ -2381,7 +2314,7 @@ var rules = {
 		
 		this.active = 1;
 		anim2.add(objects.desktop,{alpha:[0,0.5]}, true, 0.6,'linear');	
-		anim2.add(objects.rules_back_button,{x:[800, objects.lb_back_button.sx]}, true, 0.5,'easeOutCubic');
+		anim2.add(objects.rules_back_button,{x:[800, objects.rules_back_button.sx]}, true, 0.5,'easeOutCubic');
 		anim2.add(objects.rules_text,{alpha:[0, 1]}, true, 1,'linear');
 		objects.rules_text.text = ['Добро пожаловать в игру Чапаев!\n\nПравила игры очень простые - нужно метким и направленным движением выбить шашки соперника с левого или правого края доски. Есть возможность улучшить характеристики шашек за внутриигровую валюту, а также приобрести дополнительные шашки. Побеждайте соперников в онлайн игре и становитесь лидером.\n\nУдачи!','Welcome to the Chapaev game!\n\nThe rules of the game are very simple - you need to accurately and directionally knock out the opponents checkers from the left or right edge of the board. There is an opportunity to improve the characteristics of checkers for in-game currency, as well as to purchase additional checkers. Defeat your rivals in an online game and become a leader.\n\nGood luck!'][LANG];
 	},
@@ -2409,6 +2342,100 @@ var rules = {
 	}	
 	
 	
+}
+
+var stickers={
+	
+	promise_resolve_send :0,
+	promise_resolve_recive :0,
+
+	show_panel: function() {
+
+		
+		if (objects.big_message_cont.visible === true || objects.req_cont.visible === true || objects.stickers_cont.ready===false) {
+			return;			
+		}
+
+
+
+		//ничего не делаем если панель еще не готова
+		if (objects.stickers_cont.ready===false || objects.stickers_cont.visible===true || state!=="p")
+			return;
+
+		//анимационное появление панели стикеров
+		anim2.add(objects.stickers_cont,{y:[450, objects.stickers_cont.sy]}, true, 0.5,'easeOutBack');
+
+	},
+
+	hide_panel: function() {
+
+		//game_res.resources.close.sound.play();
+
+		if (objects.stickers_cont.ready===false)
+			return;
+
+		//анимационное появление панели стикеров
+		anim2.add(objects.stickers_cont,{y:[objects.stickers_cont.sy, -450]}, false, 0.5,'easeInBack');
+
+	},
+
+	send : async function(id) {
+
+		if (objects.big_message_cont.visible === true || objects.req_cont.visible === true || objects.stickers_cont.ready===false) {
+			return;			
+		}
+		
+		if (this.promise_resolve_send!==0)
+			this.promise_resolve_send("forced");
+
+		this.hide_panel();
+
+		firebase.database().ref("inbox/"+opp_data.uid).set({sender:my_data.uid,message:"MSG",tm:Date.now(),data:id});
+		message.add(['Стикер отправлен сопернику','Sticker was sent to the opponent'][LANG]);
+
+		//показываем какой стикер мы отправили
+		objects.sent_sticker_area.texture=game_res.resources['sticker_texture_'+id].texture;
+		
+		await anim2.add(objects.sent_sticker_area,{alpha:[0, 0.5]}, true, 0.5,'linear');
+		
+		let res = await new Promise((resolve, reject) => {
+				stickers.promise_resolve_send = resolve;
+				setTimeout(resolve, 2000)
+			}
+		);
+		
+		if (res === "forced")
+			return;
+
+		await anim2.add(objects.sent_sticker_area,{alpha:[0.5, 0]}, false, 0.5,'linear');
+	},
+
+	receive: async function(id) {
+
+		
+		if (this.promise_resolve_recive!==0)
+			this.promise_resolve_recive("forced");
+
+		//воспроизводим соответствующий звук
+		//game_res.resources.receive_sticker.sound.play();
+
+		objects.rec_sticker_area.texture=game_res.resources['sticker_texture_'+id].texture;
+	
+		await anim2.add(objects.rec_sticker_area,{x:[-150, objects.rec_sticker_area.sx]}, true, 0.5,'easeOutBack');
+
+		let res = await new Promise((resolve, reject) => {
+				stickers.promise_resolve_recive = resolve;
+				setTimeout(resolve, 2000)
+			}
+		);
+		
+		if (res === "forced")
+			return;
+
+		anim2.add(objects.rec_sticker_area,{x:[objects.rec_sticker_area.sx, -150]}, false, 0.5,'easeInBack');
+
+	}
+
 }
 
 var cards_menu = {
@@ -2443,15 +2470,12 @@ var cards_menu = {
 
 
 		//отключаем все карточки
-		this.card_i=1;
-		for(let i=1;i<15;i++)
-			objects.mini_cards[i].visible=false;
+		objects.mini_cards.forEach(c=>c.visible=false)
 
 		//добавляем карточку ии
-		this.add_cart_ai();
+		//this.add_cart_ai();
 
-		
-		
+				
 		//подписываемся на изменения состояний пользователей
 		firebase.database().ref(room_name) .on('value', (snapshot) => {cards_menu.players_list_updated(snapshot.val());});
 
@@ -2480,7 +2504,6 @@ var cards_menu = {
 				single[uid] = players[uid].name;						
 		}
 		
-		//console.table(single);
 		
 		//убираем не играющие состояние
 		for (let uid in p_data)
@@ -2542,8 +2565,8 @@ var cards_menu = {
 		let num_of_cards = num_of_single + num_of_tables;
 		
 		//если карточек слишком много то убираем столы
-		if (num_of_cards > 14) {
-			let num_of_tables_cut = num_of_tables - (num_of_cards - 14);			
+		if (num_of_cards > 15) {
+			let num_of_tables_cut = num_of_tables - (num_of_cards - 15);			
 			
 			let num_of_tables_to_cut = num_of_tables - num_of_tables_cut;
 			
@@ -2556,7 +2579,7 @@ var cards_menu = {
 
 		
 		//убираем карточки пропавших игроков и обновляем карточки оставшихся
-		for(let i=1;i<15;i++) {			
+		for(let i=0;i<15;i++) {			
 			if (objects.mini_cards[i].visible === true && objects.mini_cards[i].type === 'single') {				
 				let card_uid = objects.mini_cards[i].uid;				
 				if (single[card_uid] === undefined)					
@@ -2575,7 +2598,7 @@ var cards_menu = {
 		for (let p in single) {
 			
 			let found = 0;
-			for(let i=1;i<15;i++) {			
+			for(let i=0;i<15;i++) {			
 			
 				if (objects.mini_cards[i].visible === true && objects.mini_cards[i].type === 'single') {					
 					if (p ===  objects.mini_cards[i].uid) {
@@ -2592,7 +2615,7 @@ var cards_menu = {
 
 		
 		//убираем исчезнувшие столы (если их нет в новом перечне) и оставляем новые
-		for(let i=1;i<15;i++) {			
+		for(let i=0;i<15;i++) {			
 		
 			if (objects.mini_cards[i].visible === true && objects.mini_cards[i].type === 'table') {
 				
@@ -2658,7 +2681,7 @@ var cards_menu = {
 
 	place_table : function (params={uid1:0,uid2:0,name1: "XXX",name2: "XXX", rating1: 1400, rating2: 1400}) {
 				
-		for(let i=1;i<15;i++) {
+		for(let i=0;i<15;i++) {
 
 			//это если есть вакантная карточка
 			if (objects.mini_cards[i].visible===false) {
@@ -2725,7 +2748,7 @@ var cards_menu = {
 
 	place_new_cart: function(params={uid:0, state: "o", name: "XXX", rating: rating}) {
 
-		for(let i=1;i<15;i++) {
+		for(let i=0;i<15;i++) {
 
 			//это если есть вакантная карточка
 			if (objects.mini_cards[i].visible===false) {
@@ -2842,25 +2865,6 @@ var cards_menu = {
 		}).then(t=>{			
 			params.tar_obj.texture=t;			
 		})	
-	},
-
-	add_cart_ai: function() {
-
-		//убираем элементы стола так как они не нужны
-		objects.mini_cards[0].rating_text1.visible = false;
-		objects.mini_cards[0].rating_text2.visible = false;
-		objects.mini_cards[0].avatar1.visible = false;
-		objects.mini_cards[0].avatar2.visible = false;
-		objects.mini_cards[0].rating_bcg.visible = false;
-
-		objects.mini_cards[0].bcg.tint=0x777777;
-		objects.mini_cards[0].visible=true;
-		objects.mini_cards[0].uid="AI";
-		objects.mini_cards[0].name=['Чапаев (бот)', 'Chapaev (bot)'][LANG];
-		objects.mini_cards[0].name_text.text=['Чапаев (бот)', 'Chapaev (bot)'][LANG];
-		objects.mini_cards[0].rating_text.text="1400";
-		objects.mini_cards[0].rating=1400;
-		objects.mini_cards[0].avatar.texture=game_res.resources.pc_icon.texture;
 	},
 	
 	card_down : function ( card_id ) {
@@ -2994,25 +2998,11 @@ var cards_menu = {
 			return
 		};
 
-		if (cards_menu._opp_data.uid==="AI")
-		{
-			await this.close();
-			
-			//заполняем данные бот-оппонента
-			make_text(objects.opp_card_name,cards_menu._opp_data.name,160);
-			objects.opp_card_rating.text='1400';
-			objects.opp_avatar.texture=objects.invite_avatar.texture;	
-			
-			game.activate(bot_game, 'slave');
-		}
-		else
-		{
-			sound.play('click');
-			objects.invite_button_title.text=['Ждите ответ..','Waiting...'][LANG];
-			firebase.database().ref("inbox/"+cards_menu._opp_data.uid).set({sender:my_data.uid,message:"INV",tm:Date.now()});
-			pending_player=cards_menu._opp_data.uid;
 
-		}
+		sound.play('click');
+		objects.invite_button_title.text=['Ждите ответ..','Waiting...'][LANG];
+		firebase.database().ref("inbox/"+cards_menu._opp_data.uid).set({sender:my_data.uid,message:"INV",tm:Date.now()});
+		pending_player=cards_menu._opp_data.uid;
 
 	},
 
@@ -3040,7 +3030,7 @@ var cards_menu = {
 
 		//закрываем меню и начинаем игру
 		await cards_menu.close();
-		game.activate(online_game, "master");
+		mp_game.activate("master");
 	},
 
 	back_button_down: async function() {
@@ -3650,6 +3640,7 @@ async function init_game_env(l) {
 	let c = document.body.appendChild(app.view);
 	c.style["boxShadow"] = "0 0 15px #000000";
 
+
 	resize();
 	window.addEventListener("resize", resize);
 
@@ -3668,7 +3659,12 @@ async function init_game_env(l) {
         case "block":
             eval(load_list[i].code0);
             break;
-
+			
+        case "asprite":
+			objects[obj_name] = gres[obj_name].animation;
+            eval(load_list[i].code0);
+            break;
+			
         case "cont":
             eval(load_list[i].code0);
             break;
@@ -3687,8 +3683,7 @@ async function init_game_env(l) {
         const obj_class = load_list[i].class;
         const obj_name = load_list[i].name;
 		console.log('Processing: ' + obj_name)
-		
-		
+				
         switch (obj_class) {
         case "sprite":
             eval(load_list[i].code1);
@@ -3697,7 +3692,11 @@ async function init_game_env(l) {
         case "block":
             eval(load_list[i].code1);
             break;
-
+			
+        case "asprite":	
+			eval(load_list[i].code1);
+            break;
+			
         case "cont":	
 			eval(load_list[i].code1);
             break;
@@ -3849,6 +3848,7 @@ async function init_game_env(l) {
 	//показыаем основное меню
 	main_menu.activate();
 
+
 	//запускаем главный цикл
 	main_loop();
 	
@@ -3863,36 +3863,41 @@ async function load_resources() {
 	return;*/
 
 
-	let git_src="https://akukamil.github.io/hex_battle/"
-	//git_src=""
+	//let git_src="https://akukamil.github.io/hex_battle/"
+	git_src=""
 
-
+	PIXI.Loader.registerPlugin(PIXI.gif.AnimatedGIFLoader);
 	game_res=new PIXI.Loader();
+	
+	
 	game_res.add("m2_font", git_src+"fonts/MS_Comic_Sans/font.fnt");
 
-	game_res.add('receive_move',git_src+'receive_move.mp3');
-	game_res.add('note',git_src+'note.mp3');
-	game_res.add('receive_sticker',git_src+'receive_sticker.mp3');
-	game_res.add('message',git_src+'message.mp3');
-	game_res.add('lose',git_src+'lose.mp3');
-	game_res.add('win',git_src+'win.mp3');
-	game_res.add('click',git_src+'click.mp3');
-	game_res.add('close',git_src+'close.mp3');
-	game_res.add('locked',git_src+'locked.mp3');
-	game_res.add('clock',git_src+'clock.mp3');
-	game_res.add('music',git_src+'music.mp3');
-	game_res.add('hit',git_src+'hit.mp3');
-	game_res.add('blow',git_src+'blow.mp3');
-	game_res.add('chk_out',git_src+'chk_out.mp3');
-	game_res.add('daily_reward',git_src+'daily_reward.mp3');
-	game_res.add('send_chk',git_src+'send_chk.mp3');
-	game_res.add('sel_chk_sound',git_src+'sel_chk.mp3');
-	game_res.add('flip',git_src+'flip.wav');
+	game_res.add('receive_move',git_src+'sounds/receive_move.mp3');
+	game_res.add('note',git_src+'sounds/note.mp3');
+	game_res.add('receive_sticker',git_src+'sounds/receive_sticker.mp3');
+	game_res.add('message',git_src+'sounds/message.mp3');
+	game_res.add('lose',git_src+'sounds/lose.mp3');
+	game_res.add('win',git_src+'sounds/win.mp3');
+	game_res.add('click',git_src+'sounds/click.mp3');
+	game_res.add('close',git_src+'sounds/close.mp3');
+	game_res.add('locked',git_src+'sounds/locked.mp3');
+	game_res.add('clock',git_src+'sounds/clock.mp3');
+	game_res.add('music',git_src+'sounds/music.mp3');
+	game_res.add('hit',git_src+'sounds/hit.mp3');
+	game_res.add('blow',git_src+'sounds/blow.mp3');
+	game_res.add('chk_out',git_src+'sounds/chk_out.mp3');
+	game_res.add('daily_reward',git_src+'sounds/daily_reward.mp3');
+	game_res.add('move',git_src+'sounds/move.mp3');
+	game_res.add('sel_chk_sound',git_src+'sounds/sel_chk.mp3');
+	game_res.add('flip',git_src+'sounds/flip.wav');
 	
     //добавляем из листа загрузки
-    for (var i = 0; i < load_list.length; i++)
+    for (var i = 0; i < load_list.length; i++) {
         if (load_list[i].class === "sprite" || load_list[i].class === "image" )
-            game_res.add(load_list[i].name, git_src+"res/" + load_list[i].name + "." +  load_list[i].image_format);		
+            game_res.add(load_list[i].name, git_src+"res/" + load_list[i].name + "." +  load_list[i].image_format);
+        if (load_list[i].class === "asprite" )
+            game_res.add(load_list[i].name, git_src+"gifs/" + load_list[i].res_name);
+	}
 
 	//добавляем текстуры стикеров
 	for (var i=0;i<16;i++)
