@@ -1050,9 +1050,9 @@ var sp_game = {
 		
 		await anim2.add(objects.grid_cont,{scale_xy:[base_scale, base_scale*0.6], alpha:[1,0.5]}, true, 0.3,'easeInBack');		
 		await anim2.add(objects.grid_cont,{x:[400, -400]}, true, 0.5,'easeInBack');	
-		anim2.add(bee,{y:[500, bee.sy]}, true, 1,'linear');	
+		anim2.add(bee,{x:[-100, bee.sx]}, true, 1,'linear');	
 		await big_message.show (result_info, "Сыграйте с реальным соперником для получения рейтинга", result_number);
-		anim2.add(bee,{y:[bee.y, 500]}, false, 1,'linear');	
+		anim2.add(bee,{x:[bee.x, -100]}, false, 1,'linear');	
 		this.activate();
 	
 
