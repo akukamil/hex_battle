@@ -896,8 +896,8 @@ var sp_game = {
 				
 		objects.bee_cnt.x = 50;
 		objects.opp_cnt.x= 750;
-		objects.bee_cnt.visible=true;
-		objects.opp_cnt.visible = true;
+		anim2.add(objects.bee_cnt,{y:[-100, objects.bee_cnt.sy]}, true, 0.5,'easeOutBack');	
+		anim2.add(objects.opp_cnt,{y:[-100, objects.opp_cnt.sy]}, true, 0.7,'easeOutBack');	
 				
 				
 		//показываем слева
@@ -1080,10 +1080,13 @@ var sp_game = {
 		anim2.add(objects.level_title,{x:[ objects.level_title.x,-100]}, false, 1,'easeOutBack');	
 		objects.sbg_button.visible = false;
 		let base_scale = objects.grid_cont.base_scale_xy;
+		
+		anim2.add(objects.bee_cnt,{y:[objects.bee_cnt.y, -100]}, false, 0.5,'easeInBack');	
+		anim2.add(objects.opp_cnt,{y:[objects.opp_cnt.y, -100]}, false, 0.5,'easeInBack');	
+		
 		await anim2.add(objects.grid_cont,{scale_xy:[base_scale, base_scale*0.6], alpha:[1,0.5]}, true, 0.5,'easeInBack');		
 		await anim2.add(objects.grid_cont,{x:[400, -400]}, false, 1,'easeInBack');	
-		objects.bee_cnt.visible = false;
-		objects.opp_cnt.visible = false;
+
 	},
 	
 	switch_close : function() {
