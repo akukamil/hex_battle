@@ -1490,24 +1490,22 @@ var social_dialog = {
 	
 
 	invite_down : function() {
-		
-		if (objects.social_cont.ready !== true)
-			return;
-		
+				
 		gres.click.sound.play();
 		vkBridge.send('VKWebAppShowInviteBox');
+		
+		anim2.add(objects.bm_invite_button,{alpha:[1,0]}, false, 0.5,'linear');
 		
 	},
 	
 	share_down: function() {
 		
-		if (objects.social_cont.ready !== true)
-			return;
 		
 		gres.click.sound.play();
 		vkBridge.send('VKWebAppShowWallPostBox', {"message": `Помог пчелке защитить улей, теперь мой рейтинг ${my_data.rating}. Сможешь победить меня?`,
 		"attachments": "https://vk.com/app8220670"});
 
+		anim2.add(objects.bm_share_button,{alpha:[1,0]}, false, 0.5,'linear');
 	}
 	
 }
