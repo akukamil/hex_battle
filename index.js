@@ -1,14 +1,14 @@
 var M_WIDTH=800, M_HEIGHT=450;
 var app, game_res, game, objects={}, LANG = 0, state="", game_tick=0, made_moves=0, game_id=0, my_turn=0, my_tile=0, connected = 1;
 var  h_state=0, game_platform="", hidden_state_start = 0, room_name = 'states2';
-var players="", pending_player="",tm={},me_conf_play=0, opp_conf_play=0, opp_tile = 0, opponent = {};
+var players="", pending_player="",tm={}, opp_tile = 0, opponent = {};
 var my_data={opp_id : ''},opp_data={};
 var some_process = {}, git_src = "";
 var WIN = 1, DRAW = 0, LOSE = -1, NOSYNC = 2;
 const NO_PLAYER = 0, YELLOW_PLAYER = 1, RED_PLAYER = 2;
 
 grid_data=[[244.115,45],[296.077,45],[348.038,45],[400,45],[451.962,45],[503.923,45],[555.885,45],[218.135,90],[270.096,90],[322.058,90],[374.019,90],[425.981,90],[477.942,90],[529.904,90],[581.865,90],[192.154,135],[244.115,135],[296.077,135],[348.038,135],[400,135],[451.962,135],[503.923,135],[555.885,135],[607.846,135],[166.173,180],[218.135,180],[270.096,180],[322.058,180],[374.019,180],[425.981,180],[477.942,180],[529.904,180],[581.865,180],[633.827,180],[140.192,225],[192.154,225],[244.115,225],[296.077,225],[348.038,225],[400,225],[451.962,225],[503.923,225],[555.885,225],[607.846,225],[659.808,225],[166.173,270],[218.135,270],[270.096,270],[322.058,270],[374.019,270],[425.981,270],[477.942,270],[529.904,270],[581.865,270],[633.827,270],[192.154,315],[244.115,315],[296.077,315],[348.038,315],[400,315],[451.962,315],[503.923,315],[555.885,315],[607.846,315],[218.135,360],[270.096,360],[322.058,360],[374.019,360],[425.981,360],[477.942,360],[529.904,360],[581.865,360],[244.115,405],[296.077,405],[348.038,405],[400,405],[451.962,405],[503.923,405],[555.885,405]]
-levels=[{18:2,19:0,20:0,27:0,28:0,29:0,30:0,38:0,39:0,40:0,49:0,50:0,51:1},{18:2,19:0,20:0,27:0,28:0,29:0,30:0,38:0,39:0,40:0,41:0,49:0,50:0,51:0,58:1,59:0},{18:0,19:0,20:0,27:0,28:0,29:0,30:0,31:0,37:0,38:2,39:0,40:0,41:0,42:0,48:0,49:0,50:0,51:0,52:1,58:0,59:0},{16:0,25:0,26:0,27:0,30:0,31:1,32:0,36:0,37:0,38:0,39:0,40:0,41:0,42:0,43:0,47:2,48:0,49:0,50:0,51:0,52:0,58:0,59:0},{27:0,28:0,29:0,30:0,37:0,38:0,40:0,41:0,47:0,48:0,51:0,52:0,56:1,57:0,58:0,59:0,60:0,61:0,62:2,67:0,68:0},{18:1,19:0,20:0,27:0,28:0,29:0,30:0,37:0,38:0,40:0,41:0,47:0,48:0,51:0,52:0,57:0,58:0,59:0,60:2,61:0},{18:0,19:0,20:0,26:0,27:0,28:0,29:0,30:0,31:0,36:1,37:0,41:0,42:2,47:0,48:0,51:0,52:0,57:0,58:0,59:0,60:0,61:0},{17:0,18:0,19:0,20:0,21:0,26:0,27:0,28:0,29:0,30:0,31:0,36:1,37:0,39:0,41:0,42:2,47:0,48:0,49:0,50:0,51:0,52:0,57:0,58:0,59:0,60:0,61:0},{17:1,21:0,26:0,27:0,30:0,31:0,36:0,37:0,38:0,39:0,40:0,41:0,42:0,47:0,48:0,51:0,52:0,57:0,61:2},{17:0,18:0,19:0,20:0,21:0,22:0,26:0,27:0,30:0,31:0,32:2,36:0,37:0,39:0,41:0,42:0,46:1,47:0,48:0,51:0,52:0,56:0,57:0,58:0,59:0,60:0,61:0},{2:0,3:0,4:0,9:0,10:0,11:0,12:0,17:2,18:0,19:0,20:0,21:2,26:0,27:0,30:0,31:0,36:0,37:0,41:0,42:0,47:0,48:0,51:0,52:0,57:0,58:0,60:0,61:0,66:0,67:0,68:0,69:0,74:0,75:1,76:0},{16:2,17:0,21:0,22:1,26:0,27:0,28:0,29:0,30:0,31:0,37:0,38:0,39:0,40:0,41:0,47:0,48:0,49:0,50:0,51:0,52:0,56:1,57:0,61:0,62:2},{3:0,4:0,5:0,6:0,10:0,11:0,12:0,13:0,14:0,18:1,19:0,21:0,22:0,23:0,27:0,28:0,31:0,32:0,33:2,36:0,37:0,38:0,41:0,42:0,43:0,46:0,47:1,48:0,51:0,52:0,53:0,55:0,56:0,57:0,60:0,61:2,64:0,65:0,66:0,67:0,68:0,69:0,72:0,73:0,74:0,75:0,76:0},{2:0,3:2,4:0,5:0,6:0,9:0,10:0,11:0,12:0,13:2,14:0,17:0,19:0,21:0,23:0,26:0,28:0,30:0,32:0,36:0,38:0,40:0,42:0,46:0,47:0,48:0,49:0,50:0,51:0,52:0,55:0,56:0,61:0,64:0,65:1,66:0,67:0,68:0,69:0,72:0,73:0,74:0,75:1,76:0},{10:1,11:0,17:0,18:0,19:0,20:0,21:0,26:0,31:0,35:1,36:0,37:0,38:0,39:0,40:0,41:0,42:2,43:0,46:0,48:0,51:0,53:0,56:0,58:0,60:0,62:0,65:0,67:2,68:0,70:0,73:0,74:0,75:0,76:0,77:0},{0:0,1:0,2:0,3:0,4:0,5:0,6:0,7:0,10:0,11:0,14:0,15:1,17:0,18:0,19:0,20:0,21:0,23:2,24:0,26:0,31:0,33:0,34:0,35:0,36:0,38:0,39:0,40:0,42:0,43:0,44:0,45:0,47:0,52:0,54:0,55:2,57:0,58:0,59:0,60:0,61:0,63:1,64:0,67:0,68:0,71:0,72:0,73:0,74:0,75:0,76:0,77:0,78:0}]
+levels=[{18:2,19:0,20:0,27:0,28:0,29:0,30:0,38:0,39:0,40:0,49:0,50:0,51:1},{18:2,19:0,20:0,27:0,28:0,29:0,30:0,38:0,39:0,40:0,41:0,49:0,50:0,51:0,58:1,59:0},{18:0,19:0,20:0,27:0,28:0,29:0,30:0,31:0,37:0,38:2,39:0,40:0,41:0,42:0,48:0,49:0,50:0,51:0,52:1,58:0,59:0},{16:0,25:0,26:0,27:0,30:0,31:1,32:0,36:0,37:0,38:0,39:0,40:0,41:0,42:0,43:0,47:2,48:0,49:0,50:0,51:0,52:0,58:0,59:0},{27:0,28:0,29:0,30:0,37:0,38:0,40:0,41:0,47:0,48:0,51:0,52:0,56:1,57:0,58:0,59:0,60:0,61:0,62:2,67:0,68:0},{18:1,19:0,20:0,27:0,28:0,29:0,30:0,37:0,38:0,40:0,41:0,47:0,48:0,51:0,52:0,57:0,58:0,59:0,60:2,61:0},{18:0,19:0,20:0,26:0,27:0,28:0,29:0,30:0,31:0,36:1,37:0,41:0,42:2,47:0,48:0,51:0,52:0,57:0,58:0,59:0,60:0,61:0},{17:0,18:0,19:0,20:0,21:0,26:0,27:0,28:0,29:0,30:0,31:0,36:1,37:0,39:0,41:0,42:2,47:0,48:0,49:0,50:0,51:0,52:0,57:0,58:0,59:0,60:0,61:0},{17:1,21:0,26:0,27:0,30:0,31:0,36:0,37:0,38:0,39:0,40:0,41:0,42:0,47:0,48:0,51:0,52:0,57:0,61:2},{17:0,18:0,19:0,20:0,21:0,22:0,26:0,27:0,30:0,31:0,32:2,36:0,37:0,39:0,41:0,42:0,46:1,47:0,48:0,51:0,52:0,56:0,57:0,58:0,59:0,60:0,61:0},{2:0,3:0,4:0,9:0,10:0,11:0,12:0,17:2,18:0,19:0,20:0,21:2,26:0,27:0,30:0,31:0,36:0,37:0,41:0,42:0,47:0,48:0,51:0,52:0,57:0,58:0,60:0,61:0,66:0,67:0,68:0,69:0,74:0,75:1,76:0},{16:2,17:0,21:0,22:1,26:0,27:0,28:0,29:0,30:0,31:0,37:0,38:0,39:0,40:0,41:0,47:0,48:0,49:0,50:0,51:0,52:0,56:1,57:0,61:0,62:2},{3:0,4:0,5:0,6:0,10:0,11:0,12:0,13:0,14:0,18:1,19:0,21:0,22:0,23:0,27:0,28:0,31:0,32:0,33:2,36:0,37:0,38:0,41:0,42:0,43:0,46:0,47:1,48:0,51:0,52:0,53:0,55:0,56:0,57:0,60:0,61:2,64:0,65:0,66:0,67:0,68:0,69:0,72:0,73:0,74:0,75:0,76:0},{2:0,3:2,4:0,5:0,6:0,9:0,10:0,11:0,12:0,13:2,14:0,17:0,19:0,21:0,23:0,26:0,28:0,30:0,32:0,36:0,38:0,40:0,42:0,46:0,47:0,48:0,49:0,50:0,51:0,52:0,55:0,56:0,61:0,64:0,65:1,66:0,67:0,68:0,69:0,72:0,73:0,74:0,75:1,76:0},{10:1,11:0,17:0,18:0,19:0,20:0,21:0,26:0,31:0,35:1,36:0,37:0,38:0,39:0,40:0,41:0,42:2,43:0,46:0,48:0,51:0,53:0,56:0,58:0,60:0,62:0,65:0,67:2,68:0,70:0,73:0,74:0,75:0,76:0,77:0},{0:0,1:0,2:0,3:0,4:0,5:0,6:0,7:0,10:0,11:0,14:0,15:1,17:0,18:0,19:0,20:0,21:0,23:2,24:0,26:0,31:0,33:0,34:0,35:0,36:0,38:0,39:0,40:0,42:0,43:0,44:0,45:0,47:0,52:0,54:0,55:2,57:0,58:0,59:0,60:0,61:0,63:1,64:0,67:0,68:0,71:0,72:0,73:0,74:0,75:0,76:0,77:0,78:0},{6:2,13:0,14:0,18:0,19:0,20:0,21:0,22:0,23:0,27:0,30:0,31:0,32:0,33:0,34:1,35:0,36:0,37:0,38:0,39:0,40:0,41:0,42:0,43:0,44:1,45:0,46:0,47:0,48:0,51:0,55:0,56:0,57:0,58:0,59:0,60:0,64:0,65:0,72:2},{0:1,1:0,2:0,4:0,5:0,6:1,8:0,9:0,12:0,13:0,17:0,18:0,19:0,20:0,21:0,26:0,28:0,29:2,31:0,34:0,35:0,36:0,39:0,42:0,45:0,46:0,47:0,48:0,49:0,50:0,52:0,53:0,54:2,55:1,56:0,57:0,58:0,59:2,60:0,61:0,62:0,63:0,67:0,69:0,70:0,71:0},{1:0,2:0,5:0,6:2,8:0,9:0,10:0,12:0,13:0,14:0,15:0,16:0,17:0,18:0,21:0,22:0,23:0,24:0,25:0,32:0,33:0,34:1,35:0,36:0,38:0,39:0,40:0,42:0,43:0,45:0,46:0,47:0,52:0,53:0,54:1,56:0,57:0,61:0,62:0,63:0,65:0,66:0,67:0,68:0,69:0,70:0,73:0,74:2,75:0,76:0,77:0},{0:1,1:0,2:0,3:0,4:0,5:0,6:2,7:0,8:0,13:0,14:0,15:0,17:0,18:0,19:0,20:0,21:0,23:0,24:0,26:0,27:0,30:0,31:0,33:0,34:2,35:0,36:0,38:0,39:0,40:0,42:0,43:0,44:1,45:0,47:0,48:0,51:0,52:0,54:0,55:0,57:0,58:0,59:0,60:0,61:0,63:0,64:0,65:0,70:0,71:0,72:1,73:0,74:0,75:0,76:0,77:0,78:2}]
 
 irnd = function(min,max) {	
     min = Math.ceil(min);
@@ -459,12 +459,27 @@ var big_message = {
 	
 	p_resolve : 0,
 		
-	show: async function(t1,t2) {
+	show: async function(t1, t2, fin_type) {
 				
 		if (t2!==undefined || t2!=="")
 			objects.big_message_text2.text=t2;
 		else
 			objects.big_message_text2.text='**********';
+		
+		if (fin_type === WIN) {			
+			objects.bm_next_button.texture  = gres.bm_next_button.texture;
+			objects.bm_title2.text = ['Дальше','Next'][LANG];
+		}
+		
+		if (fin_type === DRAW || fin_type === LOSE ) {			
+			objects.bm_next_button.texture  = gres.bm_retry_button.texture;
+			objects.bm_title2.text = ['Еще раз','Retry'][LANG];
+		}
+		
+		if (fin_type === 3 ) {			
+			objects.bm_next_button.texture  = gres.bm_ok_button.texture;
+			objects.bm_title2.text = ['OK','OK'][LANG];
+		}
 
 		objects.big_message_text.text=t1;
 		objects.big_message_cont.scale_xy=0.8
@@ -480,6 +495,8 @@ var big_message = {
 		
 		if (objects.big_message_cont.ready===false)
 			return;
+		
+		sound.play('click');
 		await anim2.add(objects.big_message_cont,{scale_xy:[1,0.8],alpha:[1,0.5]}, true, 0.6,'easeOutBack');	
 		await anim2.add(objects.big_message_cont,{x:[objects.big_message_cont.x,-300]}, false, 0.4,'easeInBack');		
 		this.p_resolve("close");			
@@ -584,7 +601,10 @@ var mp_game = {
 	start_time : 0,
 	disconnect_time : 0,
 	move_time_left : 0,
+	me_conf_play : 0,
+	opp_conf_play : 0,
 	timer_id : 0,
+	made_moves: 0,
 	my_role : "",
 	
 	calc_new_rating : function (old_rating, game_result) {
@@ -603,7 +623,7 @@ var mp_game = {
 		
 	},
 	
-	activate : async function (role) {
+	activate : async function (role, level) {
 		
 		this.my_role = role;
 		
@@ -611,24 +631,25 @@ var mp_game = {
 			my_turn = 1;			
 			my_tile = 1;
 			opp_tile = 3;
-			board.draw_board(levels[15], my_tile, opp_tile);
+			board.draw_board(levels[level], my_tile, opp_tile);
 		}
 
 		else {
 			my_turn = 0;			
 			my_tile = 1;
 			opp_tile = 3;
-			board.draw_board(levels[15], opp_tile, my_tile);
+			board.draw_board(levels[level], opp_tile, my_tile);
 		}
 				
 		
-		//objects.desktop.texture = gres.desktop.texture;
-		//anim2.add(objects.desktop,{alpha:[0,1]}, true, 0.4,'linear');
-		
-		objects.my_card_cont.visible = true;
-		objects.opp_card_cont.visible = true;
-		
-		
+		//показыаем карточки
+		anim2.add(objects.grid_cont,{alpha:[0,1]}, true, 0.6,'linear');
+		anim2.add(objects.my_card_cont,{x:[-100,objects.my_card_cont.sx]}, true, 0.6,'easeOutBack');	
+		anim2.add(objects.opp_card_cont,{x:[900,objects.opp_card_cont.sx]}, true, 0.6,'easeOutBack');	
+
+		//сколько сделано ходов
+		this.made_moves = 0;
+				
 		//пока еще никто не подтвердил игру
 		this.me_conf_play = 0;
 		this.opp_conf_play = 0;
@@ -638,16 +659,16 @@ var mp_game = {
 		objects.bee_cnt.visible=true;
 		objects.opp_cnt.visible = true;
 		
-		//счетчик времени
+		//счетчик времени таймер		
 		this.timer_id = setTimeout(function(){mp_game.timer_tick()}, 1000);
 		objects.timer_text.tint=0xffffff;
-		
-		//отображаем таймер
 		objects.timer_cont.visible = true;
-		objects.game_buttons_cont.visible = true;
-		this.reset_timer(20);
+		this.reset_timer(20);			
 		
-		//фиксируем врему начала игры
+		//отображаем главные кнопки		
+		objects.game_buttons_cont.visible = true;
+		
+		//фиксируем врему начала игры для статистики
 		this.start_time = Date.now();
 		
 		//вычиcляем рейтинг при проигрыше и устанавливаем его в базу он потом изменится
@@ -668,20 +689,20 @@ var mp_game = {
 		
 		if (this.move_time_left < 0 && my_turn === 1)	{
 			
-			if (me_conf_play === 1)
-				game.stop('my_timeout');
+			if (this.me_conf_play === 1)
+				this.stop('my_timeout');
 			else
-				game.stop('my_no_sync');
+				this.stop('my_no_sync');
 			
 			return;
 		}
 
 		if (this.move_time_left < -5 && my_turn === 0) {
 			
-			if (opp_conf_play === 1)
-				game.stop('opp_timeout');
+			if (this.opp_conf_play === 1)
+				this.stop('opp_timeout');
 			else
-				game.stop('opp_no_sync');
+				this.stop('opp_no_sync');
 			
 			
 			return;
@@ -728,13 +749,13 @@ var mp_game = {
 	stop : async function (result) {
 		
 		let res_array = [
+			['my_win',WIN , ['Вы выиграли!\nЗаняли больше места','You win!\nOpponent out of time']],		
+			['opp_win',LOSE, ['Вы проиграли!\nСоперник занял больше места','You lose!\nYou out of time']],
+			['draw' ,DRAW, ['Ничья','Draw!']],
 			['my_timeout',LOSE, ['Вы проиграли!\nУ вас закончилось время','You lose!\nYou out of time']],
 			['opp_timeout',WIN , ['Вы выиграли!\nУ соперника закончилось время','You win!\nOpponent out of time']],
 			['my_giveup' ,LOSE, ['Вы сдались!','You gave up!']],
 			['opp_giveup' ,WIN , ['Вы выиграли!\nСоперник сдался','You win!\nOpponent gave up!']],
-			['no_checkers_left',DRAW, ['Ничья','Draw!']],
-			['only_my_left',WIN , ['Вы выиграли!\nСкинули все шашки соперника.','You win!\nYou have thrown off all the opponents checkers']],
-			['only_opp_left',LOSE, ['Вы проиграли!\nСоперник скинул все ваши шашки.','You have lost!\nOpponent has thrown off all your checkers']],
 			['my_no_sync',NOSYNC , ['Похоже вы не захотели начинать игру.','It looks like you did not want to start the game']],
 			['opp_no_sync',NOSYNC , ['Похоже соперник не смог начать игру.','It looks like the opponent could not start the game']],
 			['my_no_connection',LOSE , ['Потеряна связь!\nИспользуйте надежное интернет соединение.','Lost connection!\nUse a reliable internet connection']]
@@ -783,41 +804,11 @@ var mp_game = {
 			//записываем результат в базу данных
 			let duration = ~~((Date.now() - this.start_time)*0.001);
 			firebase.database().ref("finishes/"+game_id).set({'player1':objects.my_card_name.text,'player2':objects.opp_card_name.text, 'res':result_number,'fin_type':result_str,'duration':duration, 'ts':firebase.database.ServerValue.TIMESTAMP});
-			
-			
-			
-			let check_players =[
-				'1NOs1k4jKvIIe80grKaEoIZ59PbuP0TWlBOoFHrUoh4=',
-				'2ifgfvcabThOq2EhUg2qYNagFukZm49Hky9CBILikrE=',
-				'ApglJugCBw3owZiptBGmAFtghywpFDUl4GOE5yTevc8=',
-				'HAXS4Uwl22XJybZg2gTbwaHUzHOMc7X1mLFS2Av8ayM=',
-				'HHNnZgYsNjwFHsGW5l3uvtX+GOeZJJcD8HQz8RcThWw=',
-				'Q91gCAYjLDQeTBZLiwmWWzWmhZnuKTAWgpLbm3kw9Uo=',
-				'X3oRx1NdLMzDqrLaKAXAahBP8Pnq1k+irMDuHKHqMbY=',
-				'Z8rpvOLTNIjvgZxnTMTSZX5Z08QfynLlxi0ZvWs0cV8=',
-				'aPehlhdOYUKrCObw76SfaIGwK8BbBm2Hk7bR+WRNgsM=',
-				'cZ9FfoeCzzwm3CbHPkBKRHTAh4qoDaJvrserVFtBvPo=',
-				'ihwRwyyjjwtumUck+HzegY6D5kZ3tIJKQ1ZHPlN6s3k=',
-				'ls4147060',
-				'nYaoPB58Z5BqhFaOqpJx10MEQblZY7wMLgUxqunbQJg=',
-				'p70n979DU+biBKD3wbiOn0hADScsGJZkoRnEAx7MRNI=',
-				'v3fob5izUFzWXThIxl1VpWbmDulYWZlfWVRBG9qzrdQ=',
-				'vNx2vRus1XIPlMFllQmDnqWfV3YZp7Ff5hYis5eKllc=',
-				'vk113552413',
-				'vk188397292',
-				'w5jjfB09gf2kWOJ0BxicV1jUtkESey7npAzj+cyE078=',
-				'wmXca5Z53ezNANjw+BkH5GpfjDOpg51D+bJGmTJHsnQ='	
-			]
-			
-			if (check_players.includes(my_data.uid) || check_players.includes(opp_data.uid))
-			{
-			firebase.database().ref("finishes2").push({'player1':objects.my_card_name.text,'player2':objects.opp_card_name.text, 'res':result_number,'fin_type':result_str,'duration':duration, 'ts':firebase.database.ServerValue.TIMESTAMP});	
-			}
-			
-		}
 		
-	
-		await big_message.show(result_info, ['Рейтинг','Rating'][LANG]+`: ${old_rating} > ${my_data.rating}`)
+		}
+			
+		await big_message.show(result_info, ['Рейтинг','Rating'][LANG]+`: ${old_rating} > ${my_data.rating}`, 3)
+		
 		set_state({state : 'o'});	
 		this.close();
 		main_menu.activate();
@@ -826,33 +817,31 @@ var mp_game = {
 	
 	send_move : function(t0id, t1id) {
 		
+		//отправили ход значит согласны играть
+		this.me_conf_play = 1;
+		
 		firebase.database().ref("inbox/"+opp_data.uid).set({sender:my_data.uid,message:"MOVE",tm:Date.now(),data:[t0id, t1id]});
 		
+		if (this.my_role === 'slave') this.made_moves++;
 	},
 	
 	receive_move : function(data) {
 		
+		//получен ход значит соперник согласен играть
+		this.opp_conf_play = 1;
+		
 		board.process_incoming_move(data[0], data[1]);
 		
-	},
-	
-	finished_event : async function(res) {
-		
-		
-		clearTimeout(this.timer_id);
-		//alert(res);
-		objects.my_card_cont.visible = false;
-		objects.opp_card_cont.visible = false;
-		objects.timer_cont.visible = false;
-		objects.game_buttons_cont.visible = false;
-		await big_message.show (["Вы выиграли","Вы проиграли","Ничья"][res],"еще раз?")		
-		objects.grid_cont.visible = false;
-		set_state ({state : 'o'});
-		main_menu.activate();
+		if (this.my_role === 'master') this.made_moves++;
 		
 	},
-	
+		
 	giveup : async function() {
+		
+		if (this.made_moves < 3) {
+			message.add(['Нельзя сдаваться в начале игры','Do not give up so early'][LANG])
+			return;
+		}
 		
 		let res = await confirm_dialog.show(['Сдаетесь?','GiveUP?'][LANG])
 		
@@ -868,9 +857,9 @@ var mp_game = {
 	
 	close : function() {
 		
-		objects.grid_cont.visible = false;
-		objects.my_card_cont.visible = false;
-		objects.opp_card_cont.visible = false;
+		anim2.add(objects.grid_cont,{alpha:[1,0]}, false, 0.6,'linear');	
+		anim2.add(objects.my_card_cont,{x:[objects.my_card_cont.x, -100]}, false, 0.6,'easeInBack');	
+		anim2.add(objects.opp_card_cont,{x:[objects.opp_card_cont.x,900]}, false, 0.6,'easeInBack');	
 		objects.timer_cont.visible = false;
 		objects.game_buttons_cont.visible = false;
 		objects.bee_cnt.visible = false;
@@ -885,7 +874,7 @@ var sp_game = {
 	on : 0,
 	level_id : 0,
 
-	activate: async function(_opp_tile) {
+	activate: async function() {
 
 		//устанавливаем локальный и удаленный статус
 		set_state ({state : 'b'});
@@ -897,7 +886,12 @@ var sp_game = {
 				
 		//это тайлы соперника и мои
 		my_tile = 1;
-		opp_tile = irnd(2,4);				
+		opp_tile = irnd(2,5);		
+
+
+		//отображаем доску
+		let max_level = levels.length - 1;
+		if (this.level_id > max_level ) this.level_id = max_level; 
 		board.draw_board(levels[this.level_id],my_tile,opp_tile);
 				
 		objects.bee_cnt.x = 50;
@@ -921,6 +915,65 @@ var sp_game = {
 		my_turn = 1;
 		
 		opponent = this;
+		
+		//подсказываем ходы на первых порах
+		if (this.level_id < 1)	this.hint_move();
+	},
+	
+	hint_move : async function(t0,t1) {
+		
+		
+		//делаем случайный ход
+		let moves = board_func.get_all_moves(objects.hex_cells, my_tile);
+		let best_move = [];
+		let best_adv = -999;
+		
+		//если нету ходов
+		if (moves.length === 0)	return;
+		
+		//проверяем каждый ход
+		let moves_ratind = [];
+		moves.forEach(m => {
+			
+			let board = board_func.get_board_copy(objects.hex_cells);
+			board_func.perform_move(board,m);
+			let adv = board_func.get_advantage(board, my_tile, opp_tile);
+			m.push(adv);
+		})
+		
+		moves.sort(function(a, b) {  return b[3] - a[3]});
+		let bmove = moves[0];
+		
+		let h0x = (objects.hex_cells[bmove[0]].x - 400)*objects.grid_cont.scale_xy + 400 - 20;
+		let h0y = (objects.hex_cells[bmove[0]].y - 225)*objects.grid_cont.scale_xy + 225;
+		
+		let h1x = (objects.hex_cells[bmove[1]].x - 400)*objects.grid_cont.scale_xy + 400 - 20;
+		let h1y = (objects.hex_cells[bmove[1]].y - 225)*objects.grid_cont.scale_xy + 225;
+		
+		objects.hand.texture = gres.hand1.texture;
+		
+		//перемещаем
+		await anim2.add(objects.hand,{x:[800, h0x], y :[450,h0y]}, true, 0.5,'easeInOutCubic');
+
+
+		//кликаем
+		objects.hand.texture = gres.hand.texture;
+		await new Promise((resolve, reject) => setTimeout(resolve, 500));
+		objects.hand.texture = gres.hand1.texture;
+		
+		
+		//перемещаем
+		await anim2.add(objects.hand,{x:[h0x, h1x], y :[h0y,h1y]}, true, 0.5,'easeInOutCubic');	
+		
+		//кликаем
+		objects.hand.texture = gres.hand.texture;
+		await new Promise((resolve, reject) => setTimeout(resolve, 500));
+		objects.hand.texture = gres.hand1.texture;
+		
+		//убираем
+		await anim2.add(objects.hand,{x:[h1x, 800], y :[h1y,450]}, false, 0.5,'easeInOutCubic');
+		
+		
 	},
 
 	reset_timer : function() {
@@ -939,46 +992,73 @@ var sp_game = {
 		if (moves.length === 0)	return;
 		
 		//проверяем каждый ход
+		let moves_ratind = [];
 		moves.forEach(m => {
 			
 			let board = board_func.get_board_copy(objects.hex_cells);
 			board_func.perform_move(board,m);
 			let adv = board_func.get_advantage(board, opp_tile, my_tile);
-			if (adv > best_adv) {
-				best_adv = adv;
-				best_move = m;				
-			}
-			
+			m.push(adv);			
 			
 		})
 		
-		//let random_move = moves[Math.floor(Math.random()*moves.length)];
-		board.process_incoming_move(best_move[0], best_move[1])
+		moves.sort(function(a, b) {  return b[3] - a[3]});
+		let num_of_moves = moves.length;
+		let random_move = moves[Math.floor(Math.random()*(num_of_moves*0.3))];
+		await board.process_incoming_move(random_move[0], random_move[1]);
+		
+		//подсказываем ходы на первых порах
+		if (this.level_id < 1)	this.hint_move();
 		
 	},
 	
-	finished_event : async function(res) {
+	stop : async function(result) {
+				
+		let res_array = [
+			['my_win',WIN , ['Вы выиграли!\nЗаняли больше места','You win!\nOpponent out of time']],		
+			['opp_win',LOSE, ['Вы проиграли!\nСоперник занял больше места','You lose!\nYou out of time']],
+			['draw' ,DRAW, ['Ничья','Draw!']]
+		];
+		
+		let result_row = res_array.find( p => p[0] === result);
+		let result_str = result_row[0];		
+		let result_number = result_row[1];
+		let result_info = result_row[2][LANG];
+		
+		
 		
 		let bee ={};
-		if (res === 0)
+		if (result_number === WIN)
 			bee = objects.bee_win
 		else
-			bee = objects.bee_lose
+			bee = objects.bee_lose	
+
+		//передвигаемся к следующему уровню если выиграли
+		if (result_number === WIN) {
+			this.level_id++;
+			firebase.database().ref("players/"+my_data.uid+"/level").set(this.level_id);
+		}
 		
+		
+		//воспроизводим звук
+		if (result_number === DRAW || result_number === LOSE || result_number === NOSYNC )
+			sound.play('lose');
+		else
+			sound.play('win');
 		
 		let base_scale = objects.grid_cont.base_scale_xy;
-		await anim2.add(objects.grid_cont,{scale_xy:[base_scale, base_scale*0.6], alpha:[1,0.5]}, true, 0.5,'easeInBack');		
-		await anim2.add(objects.grid_cont,{x:[400, -400]}, true, 1,'easeInBack');	
+		
+		await anim2.add(objects.grid_cont,{scale_xy:[base_scale, base_scale*0.6], alpha:[1,0.5]}, true, 0.3,'easeInBack');		
+		await anim2.add(objects.grid_cont,{x:[400, -400]}, true, 0.5,'easeInBack');	
 		anim2.add(bee,{y:[500, bee.sy]}, true, 1,'linear');	
-		await big_message.show (["Вы выиграли","Вы проиграли","Ничья"][res],"еще раз?")		
+		await big_message.show (result_info, "Сыграйте с реальным соперником для получения рейтинга", result_number);
 		anim2.add(bee,{y:[bee.y, 500]}, false, 1,'linear');	
-		this.level_id++;
-		this.activate(irnd(2,4));
+		this.activate();
 	
 
 	},
 	
-	stop : async function() {
+	exit_button_down : async function() {
 		
 		if (anim2.any_on()===true)
 			return;
@@ -988,20 +1068,20 @@ var sp_game = {
 		
 		let res = await confirm_dialog.show(['Уверены?','Sure?'][LANG])
 		if (res !== 'ok') return;
-		
-
-		
-		anim2.add(objects.level_title,{y:[ objects.level_title.y,-100]}, false, 1,'easeOutBack');	
+				
 		set_state({state : 'o'});
 		this.close();
 		main_menu.activate();
 	},
 	
-	close : function() {
+	close : async function() {
 		
 		//закрываем
+		anim2.add(objects.level_title,{x:[ objects.level_title.x,-100]}, false, 1,'easeOutBack');	
 		objects.sbg_button.visible = false;
-		objects.grid_cont.visible = false;
+		let base_scale = objects.grid_cont.base_scale_xy;
+		await anim2.add(objects.grid_cont,{scale_xy:[base_scale, base_scale*0.6], alpha:[1,0.5]}, true, 0.5,'easeInBack');		
+		await anim2.add(objects.grid_cont,{x:[400, -400]}, false, 1,'easeInBack');	
 		objects.bee_cnt.visible = false;
 		objects.opp_cnt.visible = false;
 	},
@@ -1073,6 +1153,7 @@ var board = {
 			c.visible=false;
 			c.icon.visible=false;
 			c.player_id = NO_PLAYER;
+			c.selection_frame.visible = false;
 			
 			let tile_player_id = level_data[i];				
 
@@ -1116,14 +1197,13 @@ var board = {
 		
 		let max_width = Math.abs(grid_data[34][0] - grid_data[44][0]);
 		let max_height = Math.abs(grid_data[0][1] - grid_data[72][1]);
-		
-		objects.grid_cont.scale_xy= 2 - ((height-90)/270);
+		let tar_scale  = (1 - (height - 180) / 180)*0.5 + 1
+		objects.grid_cont.scale_xy = tar_scale;
 		objects.grid_cont.base_scale_xy = objects.grid_cont.scale_xy
 		objects.grid_cont.pivot.x=cen_x;
 		objects.grid_cont.pivot.y=cen_y;
 		objects.grid_cont.x=400;
-		objects.grid_cont.y=225;	
-		
+		objects.grid_cont.y=225;			
 		
 		this.update_stat();
 		
@@ -1213,6 +1293,7 @@ var board = {
 	process_incoming_move : async function(t0id, t1id) {
 		
 		//показываем ход
+		sound.play("enemy_move");
 		await this.make_move(t0id, t1id);
 				
 		//проверяем могу ли я еще пойти
@@ -1253,13 +1334,13 @@ var board = {
 		//дополняем пустые 
 		for (let c of objects.hex_cells){			
 			if (c.visible && c.player_id === NO_PLAYER) {
-				await c.flip_empty(player_id, 0.1);				
+				await c.flip_empty(player_id, 0.1);	
+				sound.play("flip");
 				this.update_stat();
 			}
 
 		}
 		
-
 		//считаем результат
 		objects.hex_cells.forEach((c,i)=>{			
 			if (c.visible === true) {
@@ -1273,13 +1354,11 @@ var board = {
 		
 		let res = 0;
 		if (my_num > opp_num)
-			res = 0;
+			opponent.stop('my_win');	
 		if (my_num < opp_num)
-			res = 1;
+			opponent.stop('opp_win');	
 		if (my_num === opp_num)
-			res = 2;
-		
-		opponent.finished_event(res);		
+			opponent.stop('draw');	
 		
 	},	
 	
@@ -1296,7 +1375,6 @@ var board = {
 		
 		this.update_stat();
 
-	
 	},
 	
 	tile_down : async function(tile) {
@@ -1493,6 +1571,8 @@ var confirm_dialog = {
 			sound.play('locked')
 			return;			
 		}		
+		
+		sound.play("confirm_dialog");
 				
 		objects.confirm_msg.text=msg;
 		
@@ -1507,6 +1587,8 @@ var confirm_dialog = {
 		
 		if (objects.confirm_cont.ready===false)
 			return;
+		
+		sound.play('click')
 
 		this.close();
 		this.p_resolve(res);	
@@ -1551,7 +1633,7 @@ var process_new_message=function(msg) {
 		//в данном случае я мастер и хожу вторым
 		opp_data.uid=msg.sender;
 		game_id=msg.game_id;
-		cards_menu.accepted_invite();
+		cards_menu.accepted_invite(msg.level);
 	}
 
 	//принимаем также отрицательный ответ от соответствующего соперника
@@ -1634,7 +1716,6 @@ var req_dialog={
 
 				//throw "cut_string erroor";
 				req_dialog._opp_data.uid = uid;
-				req_dialog._opp_data.b_conf = player_data.b_conf;
 
 				//загружаем фото
 				this.load_photo(player_data.pic_url);
@@ -1693,7 +1774,8 @@ var req_dialog={
 
 		//отправляем информацию о согласии играть с идентификатором игры
 		game_id=~~(Math.random()*999);
-		firebase.database().ref("inbox/"+opp_data.uid).set({sender:my_data.uid,message:"ACCEPT",tm:Date.now(),game_id:game_id});
+		let level = irnd(15,18);
+		firebase.database().ref("inbox/"+opp_data.uid).set({sender:my_data.uid,message:"ACCEPT",tm:Date.now(),game_id:game_id, level : level});
 
 		//заполняем карточку оппонента
 		make_text(objects.opp_card_name,opp_data.name,150);
@@ -1703,7 +1785,7 @@ var req_dialog={
 		main_menu.close();
 		cards_menu.close();
 		sp_game.switch_close();
-		mp_game.activate("slave");
+		mp_game.activate("slave", level);
 
 	},
 
@@ -1861,327 +1943,6 @@ var main_menu= {
 
 var pref = {
 	
-
-	music_on : 0,
-	b_conf : [],
-	selected_checker : -1,	
-	active : 0,
-	
-	activate : async function() {
-		
-		this.active = 1;
-		this.selected_checker = -1;
-		
-		//обновляем данные о балансе
-		this.update_balance_data(0);
-		
-		//обновляем данные о покупке новой шашки
-		this.update_buy_checkers_price_data();
-		
-		
-		objects.pref_info.text = ['Здесь можно изменить начальное расположение шашек, купить новые и улучшить их характеристики','Here you can change the initial location of checkers, buy new ones and improve their characteristics'][LANG];
-		
-		//показываем элементы меню
-		anim2.add(objects.pref_info,{alpha:[0,1]}, true, 0.5,'linear');		
-		anim2.add(objects.pref_board,{alpha:[0,1]}, true, 0.5,'linear');		
-		anim2.add(objects.pref_back_button,{x:[800,objects.pref_back_button.sx]}, true, 0.5,'easeOutBack');	
-		
-		anim2.add(objects.bnc_cont,{x:[800,objects.bnc_cont.sx]}, true, 0.45,'easeOutBack');	
-		anim2.add(objects.balance_cont,{x:[800,objects.balance_cont.sx]}, true, 0.5,'easeOutBack');	
-		
-		await anim2.add(objects.pref_cont,{x:[-250,objects.pref_cont.sx]}, true, 0.5,'easeOutBack');	
-		
-		//перенаправляем события нажатия сюда
-		objects.checkers.forEach(c => {			
-			c.pointerdown = pref.checker_down.bind(pref,c);			
-		})
-					
-				
-		this.update_board(1);		
-	},
-	
-	sound_click : function() {
-		
-		if (objects.pref_sounds_slider.ready === false)
-			return;		
-		
-		if (sound.on === 1)  {
-			sound.on = 0;
-			anim2.add(objects.pref_sounds_slider,{x:[160,130]}, true, 0.25,'linear');				
-		} else {	
-			sound.on = 1;
-			anim2.add(objects.pref_sounds_slider,{x:[130,160]}, true, 0.25,'linear');				
-		}
-
-		
-		//this.sound_on = 1 - this.sound_on;		
-		
-	},
-	
-	music_click : function() {
-		
-		if (objects.pref_music_slider.ready === false)
-			return;
-		
-		if (this.music_on === 1) {
-			gres.music.sound.stop();
-			anim2.add(objects.pref_music_slider,{x:[160,130]}, true, 0.25,'linear');				
-		}
-	
-		else {
-			gres.music.sound.play();
-			anim2.add(objects.pref_music_slider,{x:[130,160]}, true, 0.25,'linear');			
-		}
-	
-		this.music_on = 1 - this.music_on;
-		
-	},	
-	
-	get_checker_by_pos : function(y,x) {
-		
-		for (let p of this.b_conf)
-			if (p[0] === y && p[1] === x)
-				return p;		
-		return 0;		
-	},
-	
-	checker_down : function(c) {
-		
-		if (anim2.any_on()===true) {
-			sound.play('locked');
-			return
-		};
-		
-		//звук
-		sound.play('sel_chk_sound');
-		
-		if (c === this.selected_checker) {			
-			objects.sel_chk.visible = false;			
-			this.selected_checker = -1;
-			anim2.add(objects.uc_cont,{x:[objects.uc_cont.x,800]}, false, 0.5,'easeInBack');	
-			return;
-		}	
-		
-		
-		
-		
-		anim2.add(objects.uc_cont,{x:[800,objects.uc_cont.sx]}, true, 0.5,'easeOutBack');	
-
-
-		objects.sel_chk.visible = true;
-		objects.sel_chk.x = c.x;
-		objects.sel_chk.y = c.y;
-		
-		this.selected_checker = c;		
-		
-		//обновляем данные о стоимости апгрейда
-		this.update_upgrade_price(c);
-		
-	},
-	
-	update_buy_checkers_price_data : function() {
-		
-		let p = (Object.keys(this.b_conf).length - 7) * 30;
-		objects.bnc_title.text = [`КУПИТЬ ШАШКУ\nЦена: ${p}$`,`BUY CHECKER\nPrice: ${p}$`][LANG];
-		
-	},
-	
-	update_upgrade_price : function(c) {		
-		
-		let cur_weight = this.b_conf[c.id][2];
-		let upgrade_price = cur_weight * 5;		
-		objects.uc_title.upgrade_price = upgrade_price;
-		objects.uc_title.text = [`УТЯЖЕЛИТЬ\nЦена: ${upgrade_price}$`,`WEIGHT\nPrice: ${upgrade_price}$'`][LANG];
-		
-	},
-	
-	update_balance_data : function(amount) {
-		
-		my_data.money += amount;
-		objects.balance_title.text = [`БАЛАНС\n${my_data.money}$`,`BALANCE\n${my_data.money}$`][LANG];
-		
-		//сохраняем конфигурацию в файербейс
-		if (amount !==0)
-			firebase.database().ref("players/"+my_data.uid+"/money").set(my_data.money);
-	},
-	
-	upgrade_selected_checker : function() {
-		
-		if (this.selected_checker === -1)	return;
-		
-
-		//проверяем количество денег
-		if (my_data.money < objects.uc_title.upgrade_price) {
-			message.add(['Недостаточно средств для покупки','Not enough money'][LANG]);
-			return;	
-		}		
-		
-		//обновляем вес и текстуру
-		let cur_weight = this.b_conf[this.selected_checker.id][2];
-		
-		if (cur_weight === 4) {
-			message.add(['Больше утяжелить нельзя','Upgrade not available'][LANG]);
-			return;	
-		}
-		
-		
-		let new_weight = cur_weight + 1;
-		this.b_conf[this.selected_checker.id][2] = new_weight;
-		this.selected_checker.bcg.texture = gres['red_checker'+new_weight].texture;
-		
-		//сперва обновляем данные о деньгах
-		this.update_balance_data(-objects.uc_title.upgrade_price);		
-		
-		//обновляем информацию на карточке
-		this.update_upgrade_price(this.selected_checker);
-				
-		//сохраняем конфигурацию в файербейс
-		firebase.database().ref("players/"+my_data.uid+"/b_conf").set(this.b_conf);
-		
-	},
-		
-	get_free_cell : function() {
-						
-		for (let y = 4 ; y < 8 ; y ++) {
-			for (let x = 0 ; x < 8 ; x ++) {
-			
-				let free = 1;
-				for (let p of Object.entries(this.b_conf)) {
-					if (p[1][0]===y && p[1][1]===x) {
-						free = 0;							
-						break;
-					}					
-				}
-
-				if (free === 1)	return [y,x];		
-			}
-		}
-		
-	},
-		
-	buy_new_checker : function() {
-		
-		let c_ids = Object.keys(this.b_conf);
-		let c_num = c_ids.length;
-		
-		if (c_num >= 16) {
-			message.add(['Больше нельзя купить шашки','Can not buy checkers anymore'][LANG]);
-			return;	
-		} 	
-		
-		let new_checker_price = (c_num-7) * 30;
-		if (my_data.money < new_checker_price) {
-			message.add(['Недостаточно средств для апгрейда','Not enough money for upgrade'][LANG]);
-			return;				
-		}
-		
-		//добавляем новую шашку
-		let new_checker_id = c_ids[0] - 1;
-		let new_place = this.get_free_cell();
-		this.b_conf[new_checker_id] = [new_place[0],new_place[1],1];	
-			
-		
-		//обновляем данные о стоимости новой шашки
-		this.update_buy_checkers_price_data();
-		
-		//обновляем данные о деньгах
-		this.update_balance_data(-new_checker_price);
-		
-		//обнолвяем доску
-		this.update_board(0);
-		
-		//сохраняем конфигурацию в файербейс
-		firebase.database().ref("players/"+my_data.uid+"/b_conf").set(this.b_conf);
-	},
-		
-	pointer_down_on_board : function(e) {
-		
-		//координаты указателя на шахматном поле
-		var mx = ~~((e.data.global.x/app.stage.scale.x - objects.pref_board.sx - 10) / 50);
-		var my = ~~((e.data.global.y/app.stage.scale.y - objects.pref_board.sy - 10) / 50);
-		
-		//проверка на валидность
-		if (mx > 7 || mx < 0 || my > 7 || my < 4) return;
-		
-		//звук
-		sound.play('sel_chk_sound');
-		
-		if (this.selected_checker!==-1) {
-			
-			anim2.add(objects.uc_cont,{x:[objects.uc_cont.x,800]}, false, 0.5,'easeInBack');
-			
-			this.b_conf[this.selected_checker.id][0] = my;
-			this.b_conf[this.selected_checker.id][1] = mx;
-						
-			this.selected_checker = -1;
-			objects.sel_chk.visible = false;
-			
-			this.update_board(0);
-			
-			return;
-		}	
-	
-	},
-	
-	update_board : function(init){
-		
-		//расставляем текущее расположение шашек
-		for (let [i, p] of Object.entries(this.b_conf)) {
-			
-			i*=1;
-			
-			if (init === 1)
-				anim2.add(objects.checkers[i],{alpha:[0,1]}, true, 0.5,'linear');	
-			
-			objects.checkers[i].x = objects.pref_board.sx + 25 + 10 + p[1]*50;
-			objects.checkers[i].y = objects.pref_board.sy + 25 + 10 + p[0]*50;
-			objects.checkers[i].bcg.texture=gres['red_checker' + p[2]].texture;
-			objects.checkers[i].visible = true;
-			
-			
-		}
-		
-		
-	},
-	
-	back_button_down : async function() {
-		
-		if (anim2.any_on()===true) {
-			sound.play('locked');
-			return
-		};
-		
-		sound.play('click');
-		
-		this.close();
-		
-		main_menu.activate();
-		
-	},
-	
-	close : async function() {
-		
-		this.active = 0;
-		
-		//сохраняем конфигурацию в файербейс
-		firebase.database().ref("players/"+my_data.uid+"/b_conf").set(this.b_conf);
-		
-		objects.sel_chk.visible = false;
-		objects.checkers.forEach(c => {c.visible = false});
-		
-		if (objects.uc_cont.visible === true)
-			anim2.add(objects.uc_cont,{x:[objects.uc_cont.x,800]}, false, 0.5,'easeInBack');
-
-		anim2.add(objects.pref_info,{alpha:[1,0]}, false, 0.5,'linear');	
-		anim2.add(objects.balance_cont,{x:[objects.balance_cont.x, 800]}, false, 0.5,'easeInBack');	
-		anim2.add(objects.bnc_cont,{x:[objects.bnc_cont.x,800]}, false, 0.45,'easeInBack');	
-		
-		
-		anim2.add(objects.pref_board,{alpha:[1,0]}, false, 0.5,'linear');		
-		anim2.add(objects.pref_back_button,{x:[objects.pref_back_button.sx,800]}, false, 0.5,'easeInBack');		
-		await anim2.add(objects.pref_cont,{x:[objects.pref_cont.x,-250]}, false, 0.5,'easeInBack');	
-		
-	}
 	
 }
 
@@ -2326,6 +2087,8 @@ var rules = {
 			return
 		};
 		
+		
+		sound.play('click');
 		await this.close();
 		main_menu.activate();
 		
@@ -3015,7 +2778,7 @@ var cards_menu = {
 
 	},
 
-	accepted_invite: async function() {
+	accepted_invite: async function(level) {
 
 		//убираем запрос на игру если он открыт
 		req_dialog.hide();
@@ -3030,7 +2793,7 @@ var cards_menu = {
 
 		//закрываем меню и начинаем игру
 		await cards_menu.close();
-		mp_game.activate("master");
+		mp_game.activate("master",level);
 	},
 
 	back_button_down: async function() {
@@ -3744,13 +3507,14 @@ async function init_game_env(l) {
 			my_data.games = data.games || 0;
 			
 		data===null ?
-			my_data.money = 0 :
-			my_data.money = data.money || 0;
+			my_data.level = 0 :
+			my_data.level = data.level || 0;
 			
-		data===null ?
-			pref.b_conf = {24:[7,0,1],25:[7,1,1],26:[7,2,1],27:[7,3,1],28:[7,4,1],29:[7,5,1],30:[7,6,1],31:[7,7,1]} :
-			pref.b_conf = data.b_conf || {24:[7,0,1],25:[7,1,1],26:[7,2,1],27:[7,3,1],28:[7,4,1],29:[7,5,1],30:[7,6,1],31:[7,7,1]};
-					
+		
+		//указываем уровень одиночной игры
+		sp_game.level_id = my_data.level;
+			
+	
 		//время последнего посещения
 		let last_seen_ts = data.tm || 1000;
 		//check_daily_reward(last_seen_ts);
@@ -3778,8 +3542,7 @@ async function init_game_env(l) {
 		//обновляем базовые данные в файербейс так могло что-то поменяться
 		firebase.database().ref("players/"+my_data.uid+"/name").set(my_data.name);
 		firebase.database().ref("players/"+my_data.uid+"/pic_url").set(my_data.pic_url);				
-		firebase.database().ref("players/"+my_data.uid+"/b_conf").set(pref.b_conf);	
-		firebase.database().ref("players/"+my_data.uid+"/money").set(my_data.money);	
+		firebase.database().ref("players/"+my_data.uid+"/level").set(my_data.level);	
 		firebase.database().ref("players/"+my_data.uid+"/rating").set(my_data.rating);
 		firebase.database().ref("players/"+my_data.uid+"/tm").set(firebase.database.ServerValue.TIMESTAMP);
 		
@@ -3884,12 +3647,11 @@ async function load_resources() {
 	game_res.add('clock',git_src+'sounds/clock.mp3');
 	game_res.add('music',git_src+'sounds/music.mp3');
 	game_res.add('hit',git_src+'sounds/hit.mp3');
-	game_res.add('blow',git_src+'sounds/blow.mp3');
-	game_res.add('chk_out',git_src+'sounds/chk_out.mp3');
-	game_res.add('daily_reward',git_src+'sounds/daily_reward.mp3');
+	game_res.add('enemy_move',git_src+'sounds/enemy_move.mp3');
+	game_res.add('confirm_dialog',git_src+'sounds/confirm_dialog.mp3');
 	game_res.add('move',git_src+'sounds/move.mp3');
 	game_res.add('sel_chk_sound',git_src+'sounds/sel_chk.mp3');
-	game_res.add('flip',git_src+'sounds/flip.wav');
+	game_res.add('flip',git_src+'sounds/flip.mp3');
 	
     //добавляем из листа загрузки
     for (var i = 0; i < load_list.length; i++) {
