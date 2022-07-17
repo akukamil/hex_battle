@@ -5,8 +5,8 @@
 
 
 <meta name="http-equiv" content="Content-type: text/html; charset=windows-1251">
-<script src="https://www.gstatic.com/firebasejs/8.3.0/firebase-app.js"></script>
-<script src="https://www.gstatic.com/firebasejs/8.2.10/firebase-database.js"></script>
+<script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-app.js"></script>
+<script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-database.js"></script>
 
 
 <style> 
@@ -143,13 +143,13 @@
 
 <script>
 firebase.initializeApp({
-	apiKey: "AIzaSyA4C4PUeAwi1zTby2KYbbTzHM39ART2W-M",
-	authDomain: "chapaev-e9873.firebaseapp.com",
-	databaseURL: "https://chapaev-e9873-default-rtdb.europe-west1.firebasedatabase.app",
-	projectId: "chapaev-e9873",
-	storageBucket: "chapaev-e9873.appspot.com",
-	messagingSenderId: "164081586081",
-	appId: "1:164081586081:web:38095017a0ca28601bc5e0"	
+	apiKey: "AIzaSyC9NMPdTEUR-YfxLBYiwEhcEDUoX4PzL5c",
+	authDomain: "hex-battle.firebaseapp.com",
+	databaseURL: "https://hex-battle-default-rtdb.europe-west1.firebasedatabase.app",
+	projectId: "hex-battle",
+	storageBucket: "hex-battle.appspot.com",
+	messagingSenderId: "736374316797",
+	appId: "1:736374316797:web:c02debce7a6278ee6c6894"
 });
 
 
@@ -199,12 +199,12 @@ function all_players() {
 		let _data = [];
 		for (let i = 0 ; i < uids.length ; i++) {
 					
-			_data.push([uids[i], data[uids[i]].name, data[uids[i]].rating, data[uids[i]].games, data[uids[i]].money, data[uids[i]].tm])		
+			_data.push([uids[i], data[uids[i]].name, data[uids[i]].rating, data[uids[i]].games, data[uids[i]].level, data[uids[i]].tm])		
 			
 		}	
 		
 		//это заголовки
-		let header = ['uid','name','rating','games','money','last_seen'];
+		let header = ['uid','name','rating','games','level','last_seen'];
 
 		my_table.create(_data, header, 'none', 'list');	
 	})
