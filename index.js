@@ -1029,8 +1029,8 @@ var sp_game = {
 	stop : async function(result) {
 				
 		let res_array = [
-			['my_win',WIN , ['Вы выиграли!\nЗаняли больше места','You win!\nOpponent out of time']],		
-			['opp_win',LOSE, ['Вы проиграли!\nСоперник занял больше места','You lose!\nYou out of time']],
+			['my_win',WIN , ['Вы выиграли!\nЗаняли больше места','You win!\nYou have captured more territory!']],		
+			['opp_win',LOSE, ['Вы проиграли!\nСоперник занял больше места','You lose!\nThe opponent has captured more territory']],
 			['draw' ,DRAW, ['Ничья','Draw!']]
 		];
 		
