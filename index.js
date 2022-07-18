@@ -639,14 +639,14 @@ var mp_game = {
 		if (this.my_role === 'master') {
 			my_turn = 1;			
 			my_tile = 1;
-			opp_tile = irnd(2,5);
+			opp_tile = irnd(2,6);
 			board.draw_board(levels[level], my_tile, opp_tile);
 		}
 
 		else {
 			my_turn = 0;			
 			my_tile = 1;
-			opp_tile = irnd(2,5);
+			opp_tile = irnd(2,6);
 			board.draw_board(levels[level], opp_tile, my_tile);
 		}
 				
@@ -895,7 +895,7 @@ var sp_game = {
 				
 		//это тайлы соперника и мои
 		my_tile = 1;
-		opp_tile = irnd(2,5);		
+		opp_tile = irnd(2,6);		
 
 
 		//отображаем доску
