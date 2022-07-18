@@ -1931,11 +1931,6 @@ var main_menu= {
 
 }
 
-var pref = {
-	
-	
-}
-
 var lb = {
 	
 	active : 0,
@@ -2069,7 +2064,7 @@ var rules = {
 		anim2.add(objects.rules_text,{alpha:[0, 1]}, true, 1,'linear');
 		
 		
-		objects.rules_text.text = ['Добро пожаловать в игру Улей (HIVE)!\n\nПравила игры очень простые - нужно помочь пчелке защитить улей от нашествия насекомых. Есть два варианта хода - клонирование или прыжок, оба действия оборачивают насекомых, которые окажутся рядом в пчел. Тот кто займет больше территории улья, объявляется победителем. Побеждайте соперников в онлайн игре и становитесь лидером.\n\nУдачи!','Welcome to the HIVE game!\n\nThe rules of the game are very simple - you need to help the bee protect the hive from the invasion of insects. There are two options for the move - cloning or jumping, both actions wrap insects that will be next to bees. Whoever occupies more territory of the hive is declared the winner. Defeat your rivals in an online game and become a leader.\n\nGood luck!'][LANG];
+		objects.rules_text.text = ['Добро пожаловать в игру Улей (HIVE)!\n\nПравила игры очень простые. Нужно помочь пчелке защитить улей от нашествия насекомых. Есть два варианта хода: клонирование или прыжок. Оба действия оборачивают насекомых, которые окажутся рядом, в пчел. Тот, кто займет больше территории улья, объявляется победителем. Побеждайте соперников в онлайн игре и становитесь лидером.\n\nУдачи!','Welcome to the HIVE game!\n\nThe rules of the game are very simple - you need to help the bee protect the hive from the invasion of insects. There are two options for the move - cloning or jumping, both actions wrap insects that will be next to bees. Whoever occupies more territory of the hive is declared the winner. Defeat your rivals in an online game and become a leader.\n\nGood luck!'][LANG];
 	},
 	
 	back_button_down : async function() {
