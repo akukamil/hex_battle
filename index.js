@@ -639,14 +639,14 @@ var mp_game = {
 		if (this.my_role === 'master') {
 			my_turn = 1;			
 			my_tile = 1;
-			opp_tile = 3;
+			opp_tile = irnd(2,5);
 			board.draw_board(levels[level], my_tile, opp_tile);
 		}
 
 		else {
 			my_turn = 0;			
 			my_tile = 1;
-			opp_tile = 3;
+			opp_tile = irnd(2,5);
 			board.draw_board(levels[level], opp_tile, my_tile);
 		}
 				
@@ -895,7 +895,7 @@ var sp_game = {
 				
 		//это тайлы соперника и мои
 		my_tile = 1;
-		opp_tile = 5;		
+		opp_tile = irnd(2,5);		
 
 
 		//отображаем доску
@@ -1065,7 +1065,7 @@ var sp_game = {
 		await anim2.add(objects.grid_cont,{scale_xy:[base_scale, base_scale*0.6], alpha:[1,0.5]}, true, 0.3,'easeInBack');		
 		await anim2.add(objects.grid_cont,{x:[400, -400]}, true, 0.5,'easeInBack');	
 		anim2.add(bee,{x:[-100, bee.sx]}, true, 1,'linear');	
-		await big_message.show (result_info, "Сыграйте с реальным соперником для получения рейтинга", result_number);
+		await big_message.show (result_info, ["Сыграйте с реальным соперником для получения рейтинга","Play online and become a leader"][LANG], result_number);
 		anim2.add(bee,{x:[bee.x, -100]}, false, 1,'linear');	
 		this.activate();
 	
@@ -1397,7 +1397,7 @@ var board = {
 			return;
 		
 		if (my_turn === 0) {
-			message.add("Не твоя очередь");
+			message.add(["Не твоя очередь","Not your turn"][LANG]);
 			return;			
 		}
 				
@@ -3366,7 +3366,7 @@ async function check_daily_reward (last_seen_ts) {
 }
 
 async function init_game_env(l) {
-		
+
 	if (l===1) LANG = 1;
 	
 	await load_resources();
@@ -3397,8 +3397,8 @@ async function init_game_env(l) {
 	c.style["boxShadow"] = "0 0 15px #000000";
 
 
-	resize();
-	window.addEventListener("resize", resize);
+	//resize();
+	//window.addEventListener("resize", resize);
 
     //создаем спрайты и массивы спрайтов и запускаем первую часть кода
     for (var i = 0; i < load_list.length; i++) {
