@@ -469,8 +469,10 @@ var big_message = {
 		//показываем социальные кнопки вконтакте
 		if (game_platform === 'VK') {			
 			objects.bm_share_button.visible = objects.bm_invite_button.visible = true;
+			objects.bm_share_title.visible = objects.bm_invite_title.visible = true;
 		} else {
 			objects.bm_share_button.visible = objects.bm_invite_button.visible = false;
+			objects.bm_share_title.visible = objects.bm_invite_title.visible = false;
 		}
 		
 		if (fin_type === WIN) {			
@@ -916,8 +918,8 @@ var sp_game = {
 		anim2.add(objects.level_title,{x:[-100, objects.level_title.sx]}, true, 1,'easeOutBack');	
 		await anim2.add(objects.grid_cont,{x:[1200, 400]}, true, 1,'easeOutBack');	
 		await anim2.add(objects.grid_cont,{scale_xy:[base_scale*0.8,base_scale], alpha:[0.5,1]}, true, 0.5,'easeOutBack');			
-				
-		objects.sbg_button.visible = true;
+		anim2.add(objects.sbg_button,{x:[900, objects.sbg_button.sx]}, true, 1,'easeOutBack');		
+
 				
 		my_turn = 1;
 		
@@ -1011,7 +1013,12 @@ var sp_game = {
 		
 		moves.sort(function(a, b) {  return b[3] - a[3]});
 		let num_of_moves = moves.length;
-		let random_move = moves[Math.floor(Math.random()*(num_of_moves*0.3))];
+		
+		
+		//устанавливаем уровень сложности в зависимости от уровня
+		let best_move_dev = 0.5 * ( 1 - this.level_id / (levels.length - 1) );
+		
+		let random_move = moves[Math.floor(Math.random()*(num_of_moves*best_move_dev))];
 		await board.process_incoming_move(random_move[0], random_move[1]);
 		
 		//подсказываем ходы на первых порах
@@ -1073,7 +1080,7 @@ var sp_game = {
 		if (objects.big_message_cont.visible === true)
 			return;
 		
-		let res = await confirm_dialog.show(['Уверены?','Sure?'][LANG])
+		let res = await confirm_dialog.show(['Закончить игру?','Stop game?'][LANG])
 		if (res !== 'ok') return;
 				
 		set_state({state : 'o'});
@@ -1744,7 +1751,7 @@ var req_dialog={
 
 	accept: function() {
 
-		if (objects.req_cont.ready===false || objects.req_cont.visible===false || objects.big_message_cont.visible===true || anim2.any_on() === true)
+		if (objects.req_cont.ready===false || objects.req_cont.visible===false ||  objects.confirm_cont.visible===true || objects.big_message_cont.visible===true || anim2.any_on() === true)
 			return;
 
 		
@@ -1810,6 +1817,7 @@ var main_menu= {
 		objects.cloud1.x = Math.sin(2+game_tick/32)*1000;
 		objects.cloud2.x = Math.sin(4+game_tick/35)*1000;
 		objects.cloud3.x = Math.sin(6+game_tick/40)*1000;
+	
 	},
 
 	close : async function() {
@@ -2187,6 +2195,7 @@ var stickers={
 
 var cards_menu = {
 	
+	state_tint :{},
 	_opp_data : {},
 	uid_pic_url_cache : {},
 	
@@ -2409,19 +2418,19 @@ var cards_menu = {
 		switch(s) {
 
 			case "o":
-				return 0x559955;
+				return this.state_tint.o;
 			break;
 
 			case "b":
-				return 0x376f37;
+				return this.state_tint.b;
 			break;
 
 			case "p":
-				return 0x344472;
+				return this.state_tint.p;
 			break;
 
 			case "w":
-				return 0x990000;
+				return this.state_tint.w;
 			break;
 		}
 	},
@@ -3619,7 +3628,6 @@ async function load_resources() {
 	
 	game_res.add("m2_font", git_src+"fonts/MS_Comic_Sans/font.fnt");
 
-	game_res.add('receive_move',git_src+'sounds/receive_move.mp3');
 	game_res.add('note',git_src+'sounds/note.mp3');
 	game_res.add('receive_sticker',git_src+'sounds/receive_sticker.mp3');
 	game_res.add('message',git_src+'sounds/message.mp3');
@@ -3629,12 +3637,9 @@ async function load_resources() {
 	game_res.add('close',git_src+'sounds/close.mp3');
 	game_res.add('locked',git_src+'sounds/locked.mp3');
 	game_res.add('clock',git_src+'sounds/clock.mp3');
-	game_res.add('music',git_src+'sounds/music.mp3');
-	game_res.add('hit',git_src+'sounds/hit.mp3');
 	game_res.add('enemy_move',git_src+'sounds/enemy_move.mp3');
 	game_res.add('confirm_dialog',git_src+'sounds/confirm_dialog.mp3');
 	game_res.add('move',git_src+'sounds/move.mp3');
-	game_res.add('sel_chk_sound',git_src+'sounds/sel_chk.mp3');
 	game_res.add('flip',git_src+'sounds/flip.mp3');
 	
     //добавляем из листа загрузки
