@@ -1083,7 +1083,7 @@ var sp_game = {
 		
 		let res = await confirm_dialog.show(['Закончить игру?','Stop game?'][LANG])
 		if (res !== 'ok') return;
-				
+		show_ad();
 		set_state({state : 'o'});
 		this.close();
 		main_menu.activate();
