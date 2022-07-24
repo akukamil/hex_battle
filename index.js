@@ -2757,7 +2757,7 @@ var cards_menu = {
 		pending_player="";
 		cards_menu._opp_data={};
 		this.hide_invite_dialog();
-		big_message.show("Соперник отказался от игры",'(((');
+		big_message.show("Соперник отказался от игры",'(((',3);
 
 	},
 
