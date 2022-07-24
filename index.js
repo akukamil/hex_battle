@@ -3312,12 +3312,8 @@ function set_state(params) {
 
 function vis_change() {
 
-		if (document.hidden === true) {			
-			if (pref.music_on === 1) gres.music.sound.pause();
+		if (document.hidden === true)		
 			hidden_state_start = Date.now();			
-		} else {			
-			if (pref.music_on === 1) gres.music.sound.resume();			
-		}
 		
 		set_state({hidden : document.hidden});
 		
