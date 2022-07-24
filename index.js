@@ -817,7 +817,7 @@ var mp_game = {
 		}
 			
 		await big_message.show(result_info, ['Рейтинг','Rating'][LANG]+`: ${old_rating} > ${my_data.rating}`, 3)
-		
+		show_ad();
 		set_state({state : 'o'});	
 		this.close();
 		main_menu.activate();
@@ -1066,6 +1066,7 @@ var sp_game = {
 		await anim2.add(objects.grid_cont,{x:[400, -400]}, true, 0.5,'easeInBack');	
 		anim2.add(bee,{x:[-100, bee.sx]}, true, 1,'linear');	
 		await big_message.show (result_info, ["Сыграйте с реальным соперником для получения рейтинга","Play online and become a leader"][LANG], result_number);
+		show_ad();
 		anim2.add(bee,{x:[bee.x, -100]}, false, 1,'linear');	
 		this.activate();
 	
