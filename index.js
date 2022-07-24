@@ -1764,7 +1764,7 @@ var req_dialog={
 
 		//отправляем информацию о согласии играть с идентификатором игры
 		game_id=~~(Math.random()*999);
-		let level = irnd(15,18);
+		let level = irnd(4,11);
 		firebase.database().ref("inbox/"+opp_data.uid).set({sender:my_data.uid,message:"ACCEPT",tm:Date.now(),game_id:game_id, level : level});
 
 		//заполняем карточку оппонента
