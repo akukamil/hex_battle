@@ -1758,7 +1758,7 @@ var req_dialog={
 
 		//отправляем информацию о согласии играть с идентификатором игры
 		game_id=~~(Math.random()*999);
-		let g_levels = [3,7,11]
+		let g_levels = [3,7,11,24]
 		let level = g_levels[Math.floor(Math.random()*g_levels.length)];
 		firebase.database().ref("inbox/"+opp_data.uid).set({sender:my_data.uid,message:"ACCEPT",tm:Date.now(),game_id:game_id, level : level});
 
