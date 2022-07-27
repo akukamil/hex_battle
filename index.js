@@ -670,6 +670,10 @@ var mp_game = {
 		objects.timer_cont.visible = true;
 		this.reset_timer(20);			
 		
+		//если открыт лидерборд то закрываем его
+		if (objects.lb_1_cont.visible===true)
+			lb.close();
+		
 		//отображаем главные кнопки		
 		objects.game_buttons_cont.visible = true;
 		
